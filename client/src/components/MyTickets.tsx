@@ -19,9 +19,10 @@ interface Meta {
 
 interface Props {
   requesterId: number;
+  onTicketClick?: (ticketId: number) => void;
 }
 
-export function MyTickets({ requesterId }: Props) {
+export function MyTickets({ requesterId, onTicketClick }: Props) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [meta, setMeta] = useState<Meta>({ total: 0, page: 1, limit: 10, totalPages: 1 });
   const [loading, setLoading] = useState(true);
@@ -150,7 +151,11 @@ export function MyTickets({ requesterId }: Props) {
               </thead>
               <tbody>
                 {tickets.map(ticket => (
-                  <tr key={ticket.id} style={{ cursor: "pointer" }}>
+                  <tr 
+                    key={ticket.id} 
+                    style={{ cursor: "pointer" }}
+                    onClick={() => onTicketClick?.(ticket.id)}
+                  >
                     <td className="fw-bold text-success">{ticket.ticketNumber}</td>
                     <td>{ticket.summary}</td>
                     <td>{ticket.category?.name}</td>

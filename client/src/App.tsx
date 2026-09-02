@@ -3,13 +3,15 @@ import { checkSystem, Category } from "./api.js";
 import { DevelopmentRequesterSelector } from "./components/DevelopmentRequesterSelector.js";
 import { CreateTicket } from "./components/CreateTicket.js";
 import { MyTickets } from "./components/MyTickets.js";
+import { TicketDetail } from "./components/TicketDetail.js";
 
 // UI states you must handle for Issue 4: idle, loading, success, error.
 type UiState = "idle" | "loading" | "success" | "error";
 
 export default function App() {
   const [requesterId, setRequesterId] = useState<number | null>(null);
-  const [currentView, setCurrentView] = useState<"home" | "create">("home");
+  const [currentView, setCurrentView] = useState<"home" | "create" | "detail">("home");
+  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [createdTicketNumber, setCreatedTicketNumber] = useState<string | null>(null);
 
   const [state, setState] = useState<UiState>("idle");
@@ -67,6 +69,12 @@ export default function App() {
           }} 
           onCancel={() => setCurrentView("home")} 
         />
+      ) : currentView === "detail" && selectedTicketId ? (
+        <TicketDetail 
+          ticketId={selectedTicketId}
+          requesterId={requesterId}
+          onBack={() => setCurrentView("home")}
+        />
       ) : (
         <>
           {createdTicketNumber && (
@@ -79,7 +87,13 @@ export default function App() {
             </div>
           )}
           
-          <MyTickets requesterId={requesterId} />
+          <MyTickets 
+            requesterId={requesterId} 
+            onTicketClick={(ticketId) => {
+              setSelectedTicketId(ticketId);
+              setCurrentView("detail");
+            }}
+          />
 
           {/* Legacy Health Check (Lab 1) - required to pass tests */}
           <div className="mt-5 pt-3 border-top border-2 border-dashed opacity-50">
