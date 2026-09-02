@@ -3,10 +3,17 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import App from "../../src/App.js";
 import * as api from "../../src/api.js";
 
+vi.mock("../../src/components/DevelopmentRequesterSelector.js", () => ({
+  DevelopmentRequesterSelector: ({ onSelect }: any) => (
+    <button onClick={() => onSelect(1)}>Mock Select Requester</button>
+  ),
+}));
+
 describe("App", () => {
   // WORKED EXAMPLE — provided for you.
   it("renders the TokTickIT heading", () => {
     render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Mock Select Requester" }));
     expect(screen.getByText(/TokTickIT/i)).toBeInTheDocument();
   });
 
@@ -23,6 +30,7 @@ describe("App", () => {
     });
     
     render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Mock Select Requester" }));
     fireEvent.click(screen.getByRole("button", { name: /check system/i }));
     
     await waitFor(() => {
@@ -36,6 +44,7 @@ describe("App", () => {
     vi.spyOn(api, "checkSystem").mockRejectedValue(new Error("Unable to connect to TokTickIT API"));
     
     render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Mock Select Requester" }));
     fireEvent.click(screen.getByRole("button", { name: /check system/i }));
     
     await waitFor(() => {

@@ -40,5 +40,22 @@ app.get("/api/categories", async (_req: Request, res: Response) => {
   }
 });
 // ---------------------------------------------------------------------------
+// Lab 2 — Development Requester Context
+// GET /api/requesters
+// ---------------------------------------------------------------------------
+app.get("/api/requesters", async (_req: Request, res: Response) => {
+  try {
+    const requesters = await getPrisma().requesterUser.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, email: true },
+    });
+    res.status(200).json(requesters);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ---------------------------------------------------------------------------
 
 export default app;
