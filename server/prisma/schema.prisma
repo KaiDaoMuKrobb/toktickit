@@ -24,4 +24,46 @@ model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   createdAt DateTime @default(now())
+  tickets   Ticket[]
+}
+
+model RequesterUser {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  tickets   Ticket[]
+}
+
+model Ticket {
+  id            Int      @id @default(autoincrement())
+  ticketNumber  String   @unique
+  summary       String
+  description   String
+  status        String   @default("New")
+  relatedSystem String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  categoryId    Int
+  category      Category @relation(fields: [categoryId], references: [id])
+  
+  requesterId   Int
+  requester     RequesterUser @relation(fields: [requesterId], references: [id])
+  
+  attachments   Attachment[]
+}
+
+model Attachment {
+  id            Int      @id @default(autoincrement())
+  filename      String
+  originalName  String
+  mimeType      String
+  size          Int
+  isRemoved     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  
+  ticketId      Int
+  ticket        Ticket   @relation(fields: [ticketId], references: [id])
 }

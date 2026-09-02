@@ -22,7 +22,23 @@ async function main() {
     });
   }
 
-  console.log("Seeded categories successfully.");
+  const requesters = [
+    { name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true },
+    { name: "Michael Brown", email: "michael@example.com", isActive: true },
+    { name: "Sarah Johnson", email: "sarah@example.com", isActive: true },
+    { name: "David Lee", email: "david@example.com", isActive: true },
+    { name: "Inactive User", email: "inactive@example.com", isActive: false },
+  ];
+
+  for (const req of requesters) {
+    await prisma.requesterUser.upsert({
+      where: { email: req.email },
+      update: req,
+      create: req
+    });
+  }
+
+  console.log("Categories and Requesters seeded successfully!");
 }
 
 main()
