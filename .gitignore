@@ -16,3 +16,7 @@ server/prisma/*.db
 # uploads (test files)
 server/uploads/*
 !server/uploads/.gitkeep
+
+# e2e test reports
+e2e/playwright-report/
+e2e/test-results/
