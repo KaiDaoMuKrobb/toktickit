@@ -1,7 +1,7 @@
 # Lab 1 — Peer Review Record  (fill this in)
 
-**Author:** <Pattarawadee Thanapoomthakul> — <67070503435> — GitHub: @<KaiDaoMuKrobb>
-**Peer reviewer:** <Panyakorn Lohaviboonsap> — <67070503424> — GitHub: @<Mixkyy>
+**Author:** Pattarawadee Thanapoomthakul — 67070503435 — GitHub: @KaiDaoMuKrobb
+**Peer reviewer:** Panyakorn Lohaviboonsap — 67070503424 — GitHub: @Mixkyy
 
 ## Pull Requests I authored (reviewed by my partner)
 | PR | Branch | Reviewer verdict |
@@ -24,4 +24,4 @@ My comment:
 - PR #6: "The /api/health endpoint correctly returns a 200 status. The frontend UI handles the loading, online, and offline states perfectly when the button is clicked. Tests pass successfully. Approved!"
 - PR #7: "Code looks great! The Category schema is correct, and the seed.ts handles duplicates perfectly. Tested locally and it works. Approved!"
 - PR #8: "Looks amazing! The categories show up perfectly on the frontend, and the backend handles the Prisma query just right. Tested locally and everything passes. Approved!"
-Partner's response: "Thanks for the help and the approval kub." / "Thanks for the review kubb. I'll continue now." / "Thank you for the review. I will be going on to the next part." / <รอเพื่อนตอบกลับ>
+Partner's response: "Thanks for the help and the approval kub." / "Thanks for the review kubb. I'll continue now." / "Thank you for the review. I will be going on to the next part." / "Thank you for all your help kubbb <3"
