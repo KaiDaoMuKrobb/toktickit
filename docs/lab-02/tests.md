@@ -11,7 +11,9 @@ We will use Test-Driven Development (TDD) for unit, API, and UI component tests.
 | API-02 | API | AC-03 | Fetch other's ticket | 403 or 404 Error returned | server/tests/lab-02/ticket-detail.api.test.ts | |
 | API-03 | API | AC-06 | Download soft-removed file | 403 or 404 Error returned | server/tests/lab-02/attachments.api.test.ts | |
 | UI-01 | UI | AC-02 | Unauthenticated access | Redirect to Requester Selection | client/src/.../MyTickets.test.tsx | |
-| UI-02 | UI | AC-01 | Submit without Summary | Field validation message; API not called | client/src/.../CreateTicket.test.tsx | |
+| UI-02 | UI | AC-07 | Submit without Summary | Field validation message; API not called | client/src/.../CreateTicket.test.tsx | |
+| UI-03 | UI | AC-10 | Search with no results | "No matching tickets" state shown | client/src/.../MyTickets.test.tsx | |
+| API-04 | API | AC-09 | Soft-remove an attachment | 200 OK, attachment metadata updated | server/tests/lab-02/attachments.api.test.ts | |
 | E2E-01 | E2E | AC-01, AC-05 | Complete responsive submission flow | Confirmation shows official number | e2e/lab-02/requester-ticket-flow.spec.ts | |
 
 ## 3. Acceptance-Criterion Traceability

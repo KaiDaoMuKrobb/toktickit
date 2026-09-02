@@ -39,6 +39,12 @@ The IT department needs an MVP ticketing system where end-users (Requesters) can
 - BR-05 Ticket attachments are limited to JPG, PNG, WEBP, and PDF. Maximum size is 5MB per file. Maximum active attachments is 5 per Ticket.
 - BR-06 Removed files are soft-removed; they must not be downloadable or previewed, but metadata remains visible.
 - BR-07 Ticket summary and description are required. Category and Related System are required.
+- BR-08 Ticket Summary must be between 5-100 characters. Description must be between 10-1000 characters.
+- BR-09 The Create Ticket submit button must be disabled while a request is in progress to prevent duplicate submissions.
+- BR-10 If ticket submission fails due to an API error, the form must retain all user-entered data and display an error message.
+- BR-11 My Tickets list defaults to 10 items per page, sorted by `updatedAt` descending (newest first).
+- BR-12 If a user has no tickets, display a clear "No tickets found" message with a prompt to create one. If a search yields no results, display "No matching tickets".
+- BR-13 Uploaded filenames must be sanitized to prevent directory traversal or injection attacks.
 
 ## 6. UI Specification Summary
 The UI will use the "Zen Green Theme". Required screens are App Shell, Requester Selection, Create Ticket, My Tickets, and Ticket Detail. See `ui-spec.md` for full details including color palette, form layout, and responsive requirements.
@@ -62,6 +68,10 @@ See `api-spec.md` for full details.
 - AC-04 Given the My Tickets screen, when the user changes pagination or filters, then the correct subset of their tickets is displayed.
 - AC-05 Given an attachment over 5MB, when the user attempts upload, then the upload is rejected with a validation error.
 - AC-06 Given a soft-removed attachment, when a user attempts to download it, then the API returns an error.
+- AC-07 Given the Create Ticket form, when the user submits without a Summary or Description, then field-level validation errors appear immediately below the missing fields.
+- AC-08 Given My Tickets is open, when the user changes the Development Requester, then the ticket list reloads to show only the new requester's tickets.
+- AC-09 Given an owned ticket, when the user clicks remove on an attachment and provides a reason, then the attachment is soft-removed and can no longer be downloaded, but its metadata remains visible.
+- AC-10 Given the My Tickets screen, when the user searches for a term with no matches, then the "No matching tickets" state is displayed.
 
 ## 10. Definition of Done
 - Implementation of all approved scope.
