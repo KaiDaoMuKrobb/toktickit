@@ -121,16 +121,7 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
     
     // Generate ticketNumber: TKT-YYYY-XXXXXX
     const currentYear = new Date().getFullYear();
-    const count = await prisma.ticket.count({
-      where: {
-        createdAt: {
-          gte: new Date(`${currentYear}-01-01T00:00:00.000Z`),
-          lt: new Date(`${currentYear + 1}-01-01T00:00:00.000Z`),
-        }
-      }
-    });
-    
-    const sequenceNumber = String(count + 1).padStart(6, '0');
+    const sequenceNumber = Math.floor(100000 + Math.random() * 900000).toString();
     const ticketNumber = `TKT-${currentYear}-${sequenceNumber}`;
 
     const newTicket = await prisma.ticket.create({
