@@ -19,6 +19,8 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  
   // Validation checks
   const isSummaryValid = summary.length >= 5 && summary.length <= 100;
   const isDescValid = description.length >= 10 && description.length <= 1000;
@@ -36,6 +38,8 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAttemptedSubmit(true);
+    
     if (!isFormValid || submitting) return;
     
     setSubmitting(true);
@@ -110,13 +114,13 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
             <label className="form-label fw-bold">Summary <span className="text-danger">*</span></label>
             <input 
               type="text" 
-              className={`form-control ${summary && !isSummaryValid ? 'is-invalid' : ''}`}
+              className={`form-control ${(attemptedSubmit || summary) && !isSummaryValid ? 'is-invalid' : ''}`}
               placeholder="Brief description of the issue"
               value={summary}
               onChange={e => setSummary(e.target.value)}
               disabled={submitting}
             />
-            {summary && !isSummaryValid && (
+            {(attemptedSubmit || summary) && !isSummaryValid && (
               <div className="invalid-feedback">Summary must be between 5 and 100 characters.</div>
             )}
           </div>
@@ -124,14 +128,14 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
           <div className="mb-4">
             <label className="form-label fw-bold">Description <span className="text-danger">*</span></label>
             <textarea 
-              className={`form-control ${description && !isDescValid ? 'is-invalid' : ''}`}
+              className={`form-control ${(attemptedSubmit || description) && !isDescValid ? 'is-invalid' : ''}`}
               rows={5}
               placeholder="Detailed description of the issue..."
               value={description}
               onChange={e => setDescription(e.target.value)}
               disabled={submitting}
             />
-            {description && !isDescValid && (
+            {(attemptedSubmit || description) && !isDescValid && (
               <div className="invalid-feedback">Description must be between 10 and 1000 characters.</div>
             )}
           </div>
@@ -149,7 +153,7 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
               type="submit" 
               className="btn text-white" 
               style={{ backgroundColor: "#006B3C" }}
-              disabled={!isFormValid || submitting}
+              disabled={submitting}
             >
               {submitting ? "Submitting..." : "Submit Ticket"}
             </button>

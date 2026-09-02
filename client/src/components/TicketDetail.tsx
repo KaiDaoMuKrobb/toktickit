@@ -117,12 +117,21 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
   };
 
   const handleRemove = async (attachmentId: number) => {
-    if (!confirm("Are you sure you want to remove this file?")) return;
+    const reason = prompt("Please provide a reason for removing this file:");
+    if (reason === null) return; // User cancelled
+    if (reason.trim() === "") {
+      alert("A reason is required to remove an attachment.");
+      return;
+    }
 
     try {
       const res = await fetch(`http://localhost:3000/api/tickets/${ticketId}/attachments/${attachmentId}`, {
         method: "DELETE",
-        headers: { "X-Development-Requester-Id": String(requesterId) }
+        headers: { 
+          "X-Development-Requester-Id": String(requesterId),
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ reason: reason.trim() })
       });
 
       if (!res.ok) {
