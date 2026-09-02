@@ -119,5 +119,78 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
 });
 
 // ---------------------------------------------------------------------------
+// Lab 2 — My Tickets List
+// GET /api/tickets
+// ---------------------------------------------------------------------------
+app.get("/api/tickets", async (req: Request, res: Response) => {
+  try {
+    const requesterIdHeader = req.headers["x-development-requester-id"];
+    if (!requesterIdHeader) {
+      return res.status(401).json({ error: "Missing X-Development-Requester-Id header" });
+    }
+    const requesterId = parseInt(requesterIdHeader as string, 10);
+
+    const { search, category, status, page = "1", limit = "10" } = req.query;
+
+    const pageNum = parseInt(page as string, 10);
+    const limitNum = parseInt(limit as string, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Build the Prisma 'where' clause
+    const where: any = { requesterId };
+
+    if (search) {
+      where.summary = { contains: search as string, mode: "insensitive" };
+    }
+    if (category) {
+      where.categoryId = parseInt(category as string, 10);
+    }
+    if (status) {
+      where.status = status as string;
+    }
+
+    const prisma = getPrisma();
+
+    const [tickets, total] = await Promise.all([
+      prisma.ticket.findMany({
+        where,
+        skip,
+        take: limitNum,
+        orderBy: { updatedAt: "desc" },
+        include: {
+          category: {
+            select: { id: true, name: true }
+          }
+        }
+      }),
+      prisma.ticket.count({ where })
+    ]);
+
+    // Map 'status' to 'currentStatus' for the API response
+    const formattedTickets = tickets.map(t => ({
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      summary: t.summary,
+      category: t.category,
+      currentStatus: t.status,
+      updatedAt: t.updatedAt
+    }));
+
+    res.status(200).json({
+      data: formattedTickets,
+      meta: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ---------------------------------------------------------------------------
 
 export default app;

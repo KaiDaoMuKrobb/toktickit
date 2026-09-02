@@ -2,6 +2,7 @@ import { useState } from "react";
 import { checkSystem, Category } from "./api.js";
 import { DevelopmentRequesterSelector } from "./components/DevelopmentRequesterSelector.js";
 import { CreateTicket } from "./components/CreateTicket.js";
+import { MyTickets } from "./components/MyTickets.js";
 
 // UI states you must handle for Issue 4: idle, loading, success, error.
 type UiState = "idle" | "loading" | "success" | "error";
@@ -34,7 +35,7 @@ export default function App() {
   }
 
   return (
-    <div className="container py-5" style={{ maxWidth: 800 }}>
+    <div className="container py-5" style={{ maxWidth: 1000 }}>
       <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
         <h1 className="h3 mb-0" style={{ cursor: 'pointer' }} onClick={() => setCurrentView("home")}>
           TokTickIT <span className="text-success">IT Service Desk</span>
@@ -78,30 +79,36 @@ export default function App() {
             </div>
           )}
           
-          <button className="btn btn-outline-success mb-4" onClick={handleCheck} disabled={state === "loading"}>
-            {state === "loading" ? "Loading…" : "Test API Health Check"}
-          </button>
+          <MyTickets requesterId={requesterId} />
 
-      {state === "success" && (
-        <div className="mt-4 border p-3">
-          <p>System Status: Online</p>
-          <p>Supported Request Categories:</p>
-          <ul>
-            {categories.length === 0 ? (
-              <li>No categories loaded yet.</li>
-            ) : (
-              categories.map(c => <li key={c.id}>{c.name}</li>)
+          {/* Legacy Health Check (Lab 1) - required to pass tests */}
+          <div className="mt-5 pt-3 border-top border-2 border-dashed opacity-50">
+            <h5 className="text-muted">Legacy Health Check</h5>
+            <button className="btn btn-outline-secondary btn-sm mb-3" onClick={handleCheck} disabled={state === "loading"}>
+              {state === "loading" ? "Loading…" : "Check System"}
+            </button>
+
+            {state === "success" && (
+              <div className="border p-3 rounded bg-light">
+                <p>System Status: Online</p>
+                <p>Supported Request Categories:</p>
+                <ul>
+                  {categories.length === 0 ? (
+                    <li>No categories loaded yet.</li>
+                  ) : (
+                    categories.map(c => <li key={c.id}>{c.name}</li>)
+                  )}
+                </ul>
+              </div>
             )}
-          </ul>
-        </div>
-      )}
 
-      {state === "error" && (
-        <div className="mt-4 border p-3">
-          <p>System Status: Offline</p>
-          <p className="text-danger">{errorMessage}</p>
-        </div>
-      )}
+            {state === "error" && (
+              <div className="border p-3 rounded bg-light">
+                <p>System Status: Offline</p>
+                <p className="text-danger">{errorMessage}</p>
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
