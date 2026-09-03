@@ -19,10 +19,6 @@ describe("GET /api/tickets", () => {
     const category = await prisma.category.findFirst();
     categoryId = category!.id;
 
-    // Clear existing tickets for these requesters to isolate tests
-    await prisma.ticket.deleteMany({
-      where: { requesterId: { in: [requester1, requester2] } }
-    });
 
     // Create tickets for requester1
     await prisma.ticket.createMany({

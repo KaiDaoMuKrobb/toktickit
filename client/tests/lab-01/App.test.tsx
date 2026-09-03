@@ -9,6 +9,20 @@ vi.mock("../../src/components/DevelopmentRequesterSelector.js", () => ({
   ),
 }));
 
+// Mock global fetch to prevent components rendered by App (like MyTickets) from making actual network requests
+global.fetch = vi.fn((url: string) => {
+  if (url.includes("/api/categories") || url.includes("/api/requesters")) {
+    return Promise.resolve({
+      ok: true,
+      json: async () => ([])
+    });
+  }
+  return Promise.resolve({
+    ok: true,
+    json: async () => ({ data: [], meta: { total: 0 } })
+  });
+}) as any;
+
 describe("App", () => {
   // WORKED EXAMPLE — provided for you.
   it("renders the TokTickIT heading", () => {

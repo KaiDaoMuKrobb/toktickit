@@ -58,12 +58,17 @@ describe("MyTickets Component", () => {
     });
   });
 
-  it("should enforce Requester Selection on unauthenticated access (UI-01, AC-02)", () => {
+  it("should enforce Requester Selection on unauthenticated access (UI-01, AC-02)", async () => {
+    (global.fetch as any).mockImplementation(() => Promise.resolve({
+      ok: true,
+      json: async () => ([])
+    }));
+    
     // Render the main App which manages auth state
     render(<App />);
 
     // Since requesterId is null initially, it should show the Requester Selection screen
-    expect(screen.getByText(/Select Development Requester/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Select Development Requester/i)).toBeInTheDocument();
     expect(screen.queryByText(/My Tickets/i)).not.toBeInTheDocument();
   });
 });
