@@ -153,7 +153,7 @@ This will open a web interface at `http://localhost:5555` where you can view, ad
 
 ## 🧪 Testing
 
-The application is fully covered by automated tests to ensure reliability. We use **Supertest** for backend integration testing and **Vitest** for frontend React component behavior testing.
+The application is fully covered by automated tests to ensure reliability. We use **Supertest** for backend integration testing, **Vitest** for frontend React component behavior testing, and **Playwright** for End-to-End (E2E) testing.
 
 **Run Backend Tests:**
 ```bash
@@ -165,6 +165,12 @@ npm run test
 ```bash
 cd client
 npm run test
+```
+
+**Run E2E Tests (Playwright):**
+```bash
+cd e2e
+npx playwright test
 ```
 
 ---
@@ -179,8 +185,10 @@ toktickit/
 │   ├── prisma/             # Database schema, migrations, and seed scripts
 │   ├── src/                # Express controllers and routes
 │   └── tests/              # Backend integration tests (Supertest)
+├── e2e/                    # End-to-End UI tests (Playwright)
 ├── docs/                   # Laboratory documentation and PDF exports
-│   └── lab-01/             # AI use reflections, peer review logs, and test evidence
+│   ├── lab-01/             # Lab 1 documents and evidence
+│   └── lab-02/             # Lab 2 specification, AI use, and peer review logs
 ├── .gitignore              # Ignored files (node_modules, .env, dist, etc.)
 └── README.md               # You are here!
 ```
