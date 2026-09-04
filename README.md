@@ -139,6 +139,8 @@ The backend currently exposes the following RESTful endpoints:
   ]
   ```
 
+> **Note:** For the complete and detailed REST API documentation covering Tickets, Attachments, Requesters, and Related Systems introduced in Lab 2, please refer to our [API Specification Document](docs/lab-02/api-spec.md).
+
 ---
 
 ## 🗄️ Database Management (Prisma Studio)
