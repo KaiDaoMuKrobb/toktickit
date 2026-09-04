@@ -15,6 +15,7 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [relatedSystem, setRelatedSystem] = useState("");
+  const [requesterName, setRequesterName] = useState("Loading...");
   
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -34,7 +35,16 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
         setLoadingCats(false);
       })
       .catch(() => setLoadingCats(false));
-  }, []);
+      
+    // Fetch requester name for display
+    fetch("http://localhost:3000/api/requesters")
+      .then(res => res.json())
+      .then(data => {
+        const req = data.find((r: any) => r.id === requesterId);
+        if (req) setRequesterName(req.name);
+      })
+      .catch(() => {});
+  }, [requesterId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +92,15 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
         {error && <div className="alert alert-danger">{error}</div>}
         
         <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Requester <span className="text-danger">*</span></label>
+            <input 
+              type="text" 
+              className="form-control bg-light"
+              value={requesterName}
+              disabled
+            />
+          </div>
           <div className="row mb-3">
             <div className="col-md-6">
               <label className="form-label fw-bold">Category <span className="text-danger">*</span></label>
