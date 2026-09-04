@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { checkSystem, Category } from "./api.js";
 import { DevelopmentRequesterSelector } from "./components/DevelopmentRequesterSelector.js";
 import { CreateTicket } from "./components/CreateTicket.js";
@@ -13,11 +13,24 @@ export default function App() {
   const [currentView, setCurrentView] = useState<"home" | "create" | "detail">("home");
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [createdTicketNumber, setCreatedTicketNumber] = useState<string | null>(null);
+  const [requesterName, setRequesterName] = useState<string>("");
 
   const [state, setState] = useState<UiState>("idle");
   const [categories, setCategories] = useState<Category[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   void categories;
+  // Fetch the requester's name whenever the requesterId changes
+  useEffect(() => {
+    if (requesterId) {
+      fetch("http://localhost:3000/api/requesters")
+        .then(res => res.json())
+        .then(data => {
+          const req = data.find((r: any) => r.id === requesterId);
+          if (req) setRequesterName(req.name);
+        })
+        .catch(() => {});
+    }
+  }, [requesterId]);
 
   if (!requesterId) {
     return <DevelopmentRequesterSelector onSelect={setRequesterId} />;
@@ -51,12 +64,15 @@ export default function App() {
               + Create Ticket
             </button>
           )}
-          <button 
-            className="btn btn-sm btn-outline-secondary" 
-            onClick={() => setRequesterId(null)}
-          >
-            Change Requester
-          </button>
+          <div className="d-flex align-items-center bg-light rounded-pill px-3 py-1 border">
+            <span className="text-muted small me-2">👤 {requesterName || "Loading..."}</span>
+            <button 
+              className="btn btn-sm btn-link text-decoration-none p-0 ms-2 border-start ps-2" 
+              onClick={() => setRequesterId(null)}
+            >
+              Change
+            </button>
+          </div>
         </div>
       </div>
 

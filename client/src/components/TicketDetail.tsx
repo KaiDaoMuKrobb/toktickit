@@ -117,7 +117,7 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
                 </div>
                 <div className="col-6 mb-3">
                   <label className="fw-bold text-muted small text-uppercase">Related System</label>
-                  <p>{ticket.relatedSystem}</p>
+                  <p>{ticket.relatedSystem?.name}</p>
                 </div>
               </div>
             </div>

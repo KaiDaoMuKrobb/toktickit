@@ -73,6 +73,22 @@ app.get("/api/categories", async (_req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// ---------------------------------------------------------------------------
+// Lab 2 — Related Systems
+// GET /api/systems
+// ---------------------------------------------------------------------------
+app.get("/api/systems", async (_req: Request, res: Response) => {
+  try {
+    const systems = await getPrisma().relatedSystem.findMany({
+      orderBy: { id: "asc" },
+      select: { id: true, name: true },
+    });
+    res.status(200).json(systems);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 // ---------------------------------------------------------------------------
 // Lab 2 — Development Requester Context
 // GET /api/requesters
@@ -102,10 +118,10 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
     }
     const requesterId = parseInt(requesterIdHeader as string, 10);
     
-    const { summary, description, categoryId, relatedSystem } = req.body;
+    const { summary, description, categoryId, relatedSystemId } = req.body;
     
     // Validate required fields
-    if (!summary || !description || !categoryId || !relatedSystem) {
+    if (!summary || !description || !categoryId || !relatedSystemId) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -130,7 +146,7 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
         summary,
         description,
         categoryId: typeof categoryId === 'string' ? parseInt(categoryId, 10) : categoryId,
-        relatedSystem,
+        relatedSystemId: typeof relatedSystemId === 'string' ? parseInt(relatedSystemId, 10) : relatedSystemId,
         requesterId,
         status: "New"
       }
@@ -243,6 +259,7 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
       where: { id: ticketId },
       include: {
         category: { select: { id: true, name: true } },
+        relatedSystem: { select: { id: true, name: true } },
         attachments: {
           select: { id: true, originalName: true, mimeType: true, size: true, isRemoved: true, createdAt: true },
           orderBy: { createdAt: 'asc' }

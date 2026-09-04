@@ -9,12 +9,13 @@ interface Props {
 
 export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [systems, setSystems] = useState<{id: number, name: string}[]>([]);
   const [loadingCats, setLoadingCats] = useState(true);
   
   const [summary, setSummary] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [relatedSystem, setRelatedSystem] = useState("");
+  const [relatedSystemId, setRelatedSystemId] = useState("");
   const [requesterName, setRequesterName] = useState("Loading...");
   
   const [submitting, setSubmitting] = useState(false);
@@ -25,13 +26,20 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
   // Validation checks
   const isSummaryValid = summary.length >= 5 && summary.length <= 100;
   const isDescValid = description.length >= 10 && description.length <= 1000;
-  const isFormValid = isSummaryValid && isDescValid && categoryId && relatedSystem;
+  const isFormValid = isSummaryValid && isDescValid && categoryId && relatedSystemId;
 
   useEffect(() => {
     fetch("http://localhost:3000/api/categories")
       .then(res => res.json())
       .then(data => {
         setCategories(data);
+      })
+      .catch(() => {});
+      
+    fetch("http://localhost:3000/api/systems")
+      .then(res => res.json())
+      .then(data => {
+        setSystems(data);
         setLoadingCats(false);
       })
       .catch(() => setLoadingCats(false));
@@ -66,7 +74,7 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
           summary,
           description,
           categoryId: Number(categoryId),
-          relatedSystem
+          relatedSystemId: Number(relatedSystemId)
         })
       });
       
@@ -118,14 +126,17 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
             </div>
             <div className="col-md-6">
               <label className="form-label fw-bold">Related System <span className="text-danger">*</span></label>
-              <input 
-                type="text" 
-                className="form-control"
-                placeholder="e.g., Email, VPN, SAP"
-                value={relatedSystem}
-                onChange={e => setRelatedSystem(e.target.value)}
-                disabled={submitting}
-              />
+              <select 
+                className="form-select"
+                value={relatedSystemId}
+                onChange={e => setRelatedSystemId(e.target.value)}
+                disabled={loadingCats || submitting}
+              >
+                <option value="">Select a system...</option>
+                {systems.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
             </div>
           </div>
           

@@ -27,6 +27,13 @@ model Category {
   tickets   Ticket[]
 }
 
+model RelatedSystem {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  tickets   Ticket[]
+}
+
 model RequesterUser {
   id        Int      @id @default(autoincrement())
   name      String
@@ -42,12 +49,14 @@ model Ticket {
   summary       String
   description   String
   status        String   @default("New")
-  relatedSystem String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
   categoryId    Int
   category      Category @relation(fields: [categoryId], references: [id])
+  
+  relatedSystemId Int
+  relatedSystem   RelatedSystem @relation(fields: [relatedSystemId], references: [id])
   
   requesterId   Int
   requester     RequesterUser @relation(fields: [requesterId], references: [id])

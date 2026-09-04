@@ -22,6 +22,22 @@ async function main() {
     });
   }
 
+  const systems = [
+    "Email",
+    "VPN",
+    "SAP",
+    "HR Portal",
+    "ERP"
+  ];
+
+  for (const name of systems) {
+    await prisma.relatedSystem.upsert({
+      where: { name },
+      update: {},
+      create: { name },
+    });
+  }
+
   const requesters = [
     { name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true },
     { name: "Michael Brown", email: "michael@example.com", isActive: true },
