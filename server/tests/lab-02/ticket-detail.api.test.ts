@@ -19,6 +19,9 @@ describe("GET /api/tickets/:id", () => {
     const category = await prisma.category.findFirst();
     if (!category) throw new Error("No category found for test");
 
+    const system = await prisma.relatedSystem.findFirst();
+    if (!system) throw new Error("No related system found for test");
+
     // Create a ticket for requester 1
     const ticket = await prisma.ticket.create({
       data: {
@@ -26,7 +29,7 @@ describe("GET /api/tickets/:id", () => {
         summary: "Test Detail Ticket",
         description: "Test Detail Description",
         categoryId: category.id,
-        relatedSystem: "System X",
+        relatedSystemId: system.id,
         requesterId: requester1Id,
         status: "New"
       }

@@ -7,6 +7,7 @@ describe("GET /api/tickets", () => {
   let requester1: number;
   let requester2: number;
   let categoryId: number;
+  let systemId: number;
 
   beforeAll(async () => {
     const prisma = getPrisma();
@@ -19,19 +20,22 @@ describe("GET /api/tickets", () => {
     const category = await prisma.category.findFirst();
     categoryId = category!.id;
 
+    const system = await prisma.relatedSystem.findFirst();
+    systemId = system!.id;
+
 
     // Create tickets for requester1
     await prisma.ticket.createMany({
       data: [
-        { ticketNumber: "T-001", summary: "Network issue", description: "Desc", categoryId, relatedSystem: "Sys", requesterId: requester1, status: "New" },
-        { ticketNumber: "T-002", summary: "Laptop broken", description: "Desc", categoryId, relatedSystem: "Sys", requesterId: requester1, status: "In Progress" },
-        { ticketNumber: "T-003", summary: "Password reset", description: "Desc", categoryId, relatedSystem: "Sys", requesterId: requester1, status: "New" },
+        { ticketNumber: "T-001", summary: "Network issue", description: "Desc", categoryId, relatedSystemId: systemId, requesterId: requester1, status: "New" },
+        { ticketNumber: "T-002", summary: "Laptop broken", description: "Desc", categoryId, relatedSystemId: systemId, requesterId: requester1, status: "In Progress" },
+        { ticketNumber: "T-003", summary: "Password reset", description: "Desc", categoryId, relatedSystemId: systemId, requesterId: requester1, status: "New" },
       ]
     });
 
     // Create tickets for requester2
     await prisma.ticket.create({
-      data: { ticketNumber: "T-004", summary: "Access denied", description: "Desc", categoryId, relatedSystem: "Sys", requesterId: requester2, status: "New" }
+      data: { ticketNumber: "T-004", summary: "Access denied", description: "Desc", categoryId, relatedSystemId: systemId, requesterId: requester2, status: "New" }
     });
   });
 

@@ -20,6 +20,7 @@ describe("Attachments API", () => {
     requester2 = requesters[1].id;
 
     const category = await prisma.category.findFirst();
+    const system = await prisma.relatedSystem.findFirst();
 
     // Create a ticket for requester1
     const ticket = await prisma.ticket.create({
@@ -28,7 +29,7 @@ describe("Attachments API", () => {
         summary: "Test Attachments",
         description: "Testing attachments API",
         categoryId: category!.id,
-        relatedSystem: "System",
+        relatedSystemId: system!.id,
         requesterId: requester1,
         status: "New"
       }

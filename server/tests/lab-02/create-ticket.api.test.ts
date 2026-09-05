@@ -6,6 +6,7 @@ import { getPrisma } from "../../src/prisma.js";
 describe("POST /api/tickets", () => {
   let requesterId: number;
   let categoryId: number;
+  let systemId: number;
 
   beforeAll(async () => {
     // Get valid requester and category from db
@@ -17,6 +18,10 @@ describe("POST /api/tickets", () => {
     const category = await prisma.category.findFirst();
     if (!category) throw new Error("No category found for test");
     categoryId = category.id;
+
+    const system = await prisma.relatedSystem.findFirst();
+    if (!system) throw new Error("No related system found for test");
+    systemId = system.id;
   });
 
   afterAll(async () => {
@@ -28,7 +33,7 @@ describe("POST /api/tickets", () => {
       summary: "Cannot access email",
       description: "My email account has been locked out.",
       categoryId,
-      relatedSystem: "Email Server"
+      relatedSystemId: systemId
     };
 
     const response = await request(app)
@@ -51,7 +56,7 @@ describe("POST /api/tickets", () => {
         summary: "Test",
         description: "Test desc",
         categoryId,
-        relatedSystem: "System"
+        relatedSystemId: systemId
       });
 
     expect(response.status).toBe(401);
@@ -74,7 +79,7 @@ describe("POST /api/tickets", () => {
         summary: "Ab", // too short (must be 5-100)
         description: "Too short", // too short (must be 10-1000)
         categoryId,
-        relatedSystem: "System"
+        relatedSystemId: systemId
       });
 
     expect(response.status).toBe(400);
