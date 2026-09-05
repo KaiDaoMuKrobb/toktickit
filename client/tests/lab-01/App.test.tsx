@@ -25,10 +25,15 @@ global.fetch = vi.fn((url: string) => {
 
 describe("App", () => {
   // WORKED EXAMPLE — provided for you.
-  it("renders the TokTickIT heading", () => {
+  it("renders the TokTickIT heading", async () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Mock Select Requester" }));
     expect(screen.getByText(/TokTickIT/i)).toBeInTheDocument();
+    
+    // Wait for MyTickets initial fetch to settle to avoid act() warning
+    await waitFor(() => {
+      expect(screen.getByText(/You haven't submitted any tickets yet/i)).toBeInTheDocument();
+    });
   });
 
   // Issue 4 — write these yourself. Hint: mock the api module with
@@ -52,6 +57,11 @@ describe("App", () => {
     });
     expect(screen.getByText("Account and Access")).toBeInTheDocument();
     expect(screen.getByText("Hardware")).toBeInTheDocument();
+
+    // Wait for MyTickets initial fetch to settle
+    await waitFor(() => {
+      expect(screen.getByText(/You haven't submitted any tickets yet/i)).toBeInTheDocument();
+    });
   });
 
   it("shows an Offline error message when the API is unavailable", async () => {
@@ -65,5 +75,10 @@ describe("App", () => {
       expect(screen.getByText(/System Status: Offline/i)).toBeInTheDocument();
     });
     expect(screen.getByText(/Unable to connect to TokTickIT API/i)).toBeInTheDocument();
+
+    // Wait for MyTickets initial fetch to settle
+    await waitFor(() => {
+      expect(screen.getByText(/You haven't submitted any tickets yet/i)).toBeInTheDocument();
+    });
   });
 });
