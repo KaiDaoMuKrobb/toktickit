@@ -1,40 +1,46 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { checkSystem, Category } from "./api.js";
-import { DevelopmentRequesterSelector } from "./components/DevelopmentRequesterSelector.js";
 import { CreateTicket } from "./components/CreateTicket.js";
 import { MyTickets } from "./components/MyTickets.js";
 import { TicketDetail } from "./components/TicketDetail.js";
+import { AuthProvider, useAuth } from "./AuthContext.js";
+import { Login } from "./components/Login.js";
+import { ChangePassword } from "./components/ChangePassword.js";
 
 // UI states you must handle for Issue 4: idle, loading, success, error.
 type UiState = "idle" | "loading" | "success" | "error";
 
-export default function App() {
-  const [requesterId, setRequesterId] = useState<number | null>(null);
+function AppContent() {
+  const { user, loading: authLoading, logout } = useAuth();
   const [currentView, setCurrentView] = useState<"home" | "create" | "detail">("home");
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [createdTicketNumber, setCreatedTicketNumber] = useState<string | null>(null);
-  const [requesterName, setRequesterName] = useState<string>("");
 
   const [state, setState] = useState<UiState>("idle");
   const [categories, setCategories] = useState<Category[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
-  void categories;
-  // Fetch the requester's name whenever the requesterId changes
-  useEffect(() => {
-    if (requesterId) {
-      fetch("http://localhost:3000/api/requesters")
-        .then(res => res.json())
-        .then(data => {
-          const req = data.find((r: any) => r.id === requesterId);
-          if (req) setRequesterName(req.name);
-        })
-        .catch(() => {});
-    }
-  }, [requesterId]);
 
-  if (!requesterId) {
-    return <DevelopmentRequesterSelector onSelect={setRequesterId} />;
+  if (authLoading) {
+    return <div className="d-flex justify-content-center mt-5"><div className="spinner-border text-success" /></div>;
   }
+
+  if (!user) {
+    return <Login />;
+  }
+
+  if (user.mustChangePassword) {
+    return <ChangePassword />;
+  }
+
+  // Get badge color based on role
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case "Requester": return "bg-primary bg-opacity-10 text-primary border-primary";
+      case "IT Staff": return "bg-success bg-opacity-10 text-success border-success";
+      case "Administrator": return "bg-dark bg-opacity-10 text-dark border-dark";
+      default: return "bg-secondary bg-opacity-10 text-secondary border-secondary";
+    }
+  };
 
   async function handleCheck() {
     setState("loading");
@@ -65,12 +71,15 @@ export default function App() {
             </button>
           )}
           <div className="d-flex align-items-center bg-light rounded-pill px-3 py-1 border">
-            <span className="text-muted small me-2">👤 {requesterName || "Loading..."}</span>
+            <span className="text-muted small me-2 fw-bold">{user.name}</span>
+            <span className={`badge border ${getRoleBadgeColor(user.role)} rounded-pill me-2`}>
+              {user.role}
+            </span>
             <button 
-              className="btn btn-sm btn-link text-decoration-none p-0 ms-2 border-start ps-2" 
-              onClick={() => setRequesterId(null)}
+              className="btn btn-sm btn-link text-decoration-none p-0 ms-2 border-start ps-2 text-danger" 
+              onClick={logout}
             >
-              Change
+              Logout
             </button>
           </div>
         </div>
@@ -78,7 +87,7 @@ export default function App() {
 
       {currentView === "create" ? (
         <CreateTicket 
-          requesterId={requesterId} 
+          requesterId={user.id} 
           onSuccess={(ticketNumber) => {
             setCreatedTicketNumber(ticketNumber);
             setCurrentView("home");
@@ -88,7 +97,7 @@ export default function App() {
       ) : currentView === "detail" && selectedTicketId ? (
         <TicketDetail 
           ticketId={selectedTicketId}
-          requesterId={requesterId}
+          requesterId={user.id}
           onBack={() => setCurrentView("home")}
         />
       ) : (
@@ -104,7 +113,7 @@ export default function App() {
           )}
           
           <MyTickets 
-            requesterId={requesterId} 
+            requesterId={user.id} 
             onTicketClick={(ticketId) => {
               setSelectedTicketId(ticketId);
               setCurrentView("detail");
@@ -142,5 +151,13 @@ export default function App() {
         </>
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

@@ -6,6 +6,22 @@ import App from "../../src/App.js";
 // Mock the global fetch
 global.fetch = vi.fn();
 
+import * as AuthContext from "../../src/AuthContext.js";
+
+// Mock the AuthContext so that the app renders as an unauthenticated user by default
+vi.mock("../../src/AuthContext.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../src/AuthContext.js")>();
+  return {
+    ...actual,
+    useAuth: vi.fn(() => ({
+      user: null,
+      loading: false,
+      logout: vi.fn(),
+      fetchUser: vi.fn(),
+    })),
+  };
+});
+
 describe("MyTickets Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,16 +75,11 @@ describe("MyTickets Component", () => {
   });
 
   it("should enforce Requester Selection on unauthenticated access (UI-01, AC-02)", async () => {
-    (global.fetch as any).mockImplementation(() => Promise.resolve({
-      ok: true,
-      json: async () => ([])
-    }));
-    
     // Render the main App which manages auth state
     render(<App />);
 
-    // Since requesterId is null initially, it should show the Requester Selection screen
-    expect(await screen.findByText(/Select Development Requester/i)).toBeInTheDocument();
+    // Since requesterId is null initially, it should show the Login screen
+    expect(await screen.findByText(/Sign in to the IT Service Desk/i)).toBeInTheDocument();
     expect(screen.queryByText(/My Tickets/i)).not.toBeInTheDocument();
   });
 });
