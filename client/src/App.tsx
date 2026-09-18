@@ -6,13 +6,14 @@ import { TicketDetail } from "./components/TicketDetail.js";
 import { AuthProvider, useAuth } from "./AuthContext.js";
 import { Login } from "./components/Login.js";
 import { ChangePassword } from "./components/ChangePassword.js";
+import { UserManagement } from "./components/UserManagement.js";
 
 // UI states you must handle for Issue 4: idle, loading, success, error.
 type UiState = "idle" | "loading" | "success" | "error";
 
 function AppContent() {
   const { user, loading: authLoading, logout } = useAuth();
-  const [currentView, setCurrentView] = useState<"home" | "create" | "detail">("home");
+  const [currentView, setCurrentView] = useState<"home" | "create" | "detail" | "admin">("home");
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [createdTicketNumber, setCreatedTicketNumber] = useState<string | null>(null);
 
@@ -62,6 +63,14 @@ function AppContent() {
           TokTickIT <span className="text-success">IT Service Desk</span>
         </h1>
         <div className="d-flex gap-3 align-items-center">
+          {user.role === "Administrator" && (
+            <button 
+              className={`btn ${currentView === "admin" ? "btn-dark" : "btn-outline-dark"}`} 
+              onClick={() => setCurrentView("admin")}
+            >
+              Admin Panel
+            </button>
+          )}
           {currentView === "home" && (
             <button 
               className="btn btn-success" 
@@ -100,6 +109,8 @@ function AppContent() {
           requesterId={user.id}
           onBack={() => setCurrentView("home")}
         />
+      ) : currentView === "admin" && user.role === "Administrator" ? (
+        <UserManagement />
       ) : (
         <>
           {createdTicketNumber && (
