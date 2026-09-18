@@ -37,9 +37,8 @@ export function AttachmentSection({ ticketId, requesterId, attachments, onAttach
     formData.append("file", file);
 
     try {
-      const res = await fetch(`http://localhost:3000/api/tickets/${ticketId}/attachments`, {
+      const res = await fetch(`/api/tickets/${ticketId}/attachments`, {
         method: "POST",
-        headers: { "X-Development-Requester-Id": String(requesterId) },
         body: formData
       });
 
@@ -58,9 +57,7 @@ export function AttachmentSection({ ticketId, requesterId, attachments, onAttach
   };
 
   const handleDownload = (attachmentId: number, originalName: string) => {
-    fetch(`http://localhost:3000/api/attachments/${attachmentId}/download`, {
-      headers: { "X-Development-Requester-Id": String(requesterId) }
-    })
+    fetch(`/api/attachments/${attachmentId}/download`)
       .then(res => {
         if (!res.ok) throw new Error("File not found or removed");
         return res.blob();
@@ -87,10 +84,9 @@ export function AttachmentSection({ ticketId, requesterId, attachments, onAttach
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/api/tickets/${ticketId}/attachments/${attachmentId}`, {
+      const res = await fetch(`/api/tickets/${ticketId}/attachments/${attachmentId}`, {
         method: "DELETE",
         headers: { 
-          "X-Development-Requester-Id": String(requesterId),
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ reason: reason.trim() })

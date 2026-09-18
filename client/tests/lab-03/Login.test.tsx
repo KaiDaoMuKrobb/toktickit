@@ -29,7 +29,7 @@ describe("Lab 3: Authentication UI", () => {
       logout: mockLogout,
     });
     
-    global.fetch = vi.fn();
+    globalThis.fetch = vi.fn();
   });
 
   describe("Login Component", () => {
@@ -42,7 +42,7 @@ describe("Lab 3: Authentication UI", () => {
     });
 
     it("displays an error message on failed login", async () => {
-      vi.mocked(global.fetch).mockResolvedValueOnce({
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce({
         ok: false,
         json: async () => ({ message: "Invalid credentials" }),
       } as any);
@@ -61,7 +61,7 @@ describe("Lab 3: Authentication UI", () => {
     });
 
     it("calls fetchUser on successful login", async () => {
-      vi.mocked(global.fetch).mockResolvedValueOnce({
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce({
         ok: true,
       } as any);
 
@@ -108,7 +108,7 @@ describe("Lab 3: Authentication UI", () => {
         expect(screen.getByText("New passwords do not match.")).toBeInTheDocument();
       });
       
-      expect(global.fetch).not.toHaveBeenCalled();
+      expect(globalThis.fetch).not.toHaveBeenCalled();
     });
 
     it("validates that the new password is at least 8 characters", async () => {
@@ -124,11 +124,11 @@ describe("Lab 3: Authentication UI", () => {
         expect(screen.getByText("New password must be at least 8 characters.")).toBeInTheDocument();
       });
       
-      expect(global.fetch).not.toHaveBeenCalled();
+      expect(globalThis.fetch).not.toHaveBeenCalled();
     });
 
     it("calls API and fetchUser on success", async () => {
-      vi.mocked(global.fetch).mockResolvedValueOnce({
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce({
         ok: true,
       } as any);
 
@@ -141,7 +141,7 @@ describe("Lab 3: Authentication UI", () => {
       fireEvent.click(screen.getByRole("button", { name: /Update Password/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith("/api/auth/change-password", expect.any(Object));
+        expect(globalThis.fetch).toHaveBeenCalledWith("/api/auth/change-password", expect.any(Object));
         expect(mockFetchUser).toHaveBeenCalled();
       });
     });

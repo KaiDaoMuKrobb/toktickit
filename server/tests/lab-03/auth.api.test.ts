@@ -5,8 +5,11 @@ import { getPrisma } from "../../src/prisma.js";
 
 describe("Lab 3: Authentication APIs", () => {
   beforeAll(async () => {
-    // Run the seed to ensure we have the right users
-    // (Assuming the global setup or beforeAll has already run the DB migration and seed)
+    // Reset test user state
+    await getPrisma().user.updateMany({
+      where: { email: "newuser@example.com" },
+      data: { mustChangePassword: true }
+    });
   });
 
   afterAll(async () => {

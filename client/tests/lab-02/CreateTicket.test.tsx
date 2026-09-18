@@ -3,12 +3,12 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { CreateTicket } from "../../src/components/CreateTicket.js";
 
 // Mock the global fetch
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 describe("CreateTicket Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (global.fetch as any).mockResolvedValue({
+    (globalThis.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ([]) // Mock categories/systems fetch if necessary
     });
@@ -33,7 +33,7 @@ describe("CreateTicket Component", () => {
     });
 
     // The fetch should only have been called for categories/systems, not for POSTing the ticket
-    const fetchCalls = (global.fetch as any).mock.calls;
+    const fetchCalls = (globalThis.fetch as any).mock.calls;
     const postCalls = fetchCalls.filter((call: any) => call[1]?.method === "POST");
     expect(postCalls.length).toBe(0);
     expect(onSuccess).not.toHaveBeenCalled();

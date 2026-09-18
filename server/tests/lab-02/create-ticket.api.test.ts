@@ -5,15 +5,22 @@ import { getPrisma } from "../../src/prisma.js";
 
 describe("POST /api/tickets", () => {
   let requesterId: number;
+  let authCookie: string;
   let categoryId: number;
   let systemId: number;
 
   beforeAll(async () => {
     // Get valid requester and category from db
     const prisma = getPrisma();
-    const requester = await prisma.requesterUser.findFirst({ where: { isActive: true } });
+    const requester = await prisma.user.findFirst({ where: { isActive: true, role: "Requester" } });
     if (!requester) throw new Error("No active requester found for test");
     requesterId = requester.id;
+
+    const loginRes = await request(app).post("/api/auth/login").send({
+      email: requester.email,
+      password: "password123"
+    });
+    authCookie = loginRes.headers["set-cookie"][0].split(";")[0];
 
     const category = await prisma.category.findFirst();
     if (!category) throw new Error("No category found for test");
@@ -38,7 +45,7 @@ describe("POST /api/tickets", () => {
 
     const response = await request(app)
       .post("/api/tickets")
-      .set("X-Development-Requester-Id", String(requesterId))
+      .set("Cookie", authCookie)
       .send(payload);
 
     expect(response.status).toBe(201);
@@ -49,7 +56,7 @@ describe("POST /api/tickets", () => {
     expect(response.body.summary).toBe(payload.summary);
   });
 
-  it("should fail if X-Development-Requester-Id is missing", async () => {
+  it("should fail if authentication cookie is missing", async () => {
     const response = await request(app)
       .post("/api/tickets")
       .send({
@@ -65,7 +72,7 @@ describe("POST /api/tickets", () => {
   it("should fail if required fields are missing", async () => {
     const response = await request(app)
       .post("/api/tickets")
-      .set("X-Development-Requester-Id", String(requesterId))
+      .set("Cookie", authCookie)
       .send({ summary: "Test" }); // missing desc, category, system
 
     expect(response.status).toBe(400);
@@ -74,7 +81,7 @@ describe("POST /api/tickets", () => {
   it("should validate field lengths", async () => {
     const response = await request(app)
       .post("/api/tickets")
-      .set("X-Development-Requester-Id", String(requesterId))
+      .set("Cookie", authCookie)
       .send({
         summary: "Ab", // too short (must be 5-100)
         description: "Too short", // too short (must be 10-1000)
