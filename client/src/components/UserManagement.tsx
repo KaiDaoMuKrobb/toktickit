@@ -284,16 +284,16 @@ export function UserManagement() {
               </div>
               <div className="modal-body">
                 <div className="mb-3">
-                  <label className="form-label">Name</label>
-                  <input type="text" className="form-control" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
+                  <label htmlFor="edit-name" className="form-label">Name</label>
+                  <input id="edit-name" type="text" className="form-control" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Email</label>
-                  <input type="email" className="form-control" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required />
+                  <label htmlFor="edit-email" className="form-label">Email</label>
+                  <input id="edit-email" type="email" className="form-control" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Role</label>
-                  <select className="form-select" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
+                  <label htmlFor="edit-role" className="form-label">Role</label>
+                  <select id="edit-role" className="form-select" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
                     <option value="Requester">Requester</option>
                     <option value="IT Staff">IT Staff</option>
                     <option value="Administrator">Administrator</option>
@@ -323,8 +323,8 @@ export function UserManagement() {
               </div>
               <div className="modal-body">
                 <div className="mb-3">
-                  <label className="form-label">New Password</label>
-                  <input type="password" className="form-control" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} required minLength={8} />
+                  <label htmlFor="reset-password" className="form-label">New Password</label>
+                  <input id="reset-password" type="password" className="form-control" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} required minLength={8} />
                   <small className="text-muted">User will be required to change this upon next login.</small>
                 </div>
               </div>
