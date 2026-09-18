@@ -37,8 +37,8 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
   const [error, setError] = useState("");
 
   const fetchTicket = () => {
-    fetch(`http://localhost:3000/api/tickets/${ticketId}`, {
-      headers: { "X-Development-Requester-Id": String(requesterId) }
+    fetch(`/api/tickets/${ticketId}`, {
+      method: "GET"
     })
       .then(res => {
         if (!res.ok) throw new Error("Failed to load ticket");

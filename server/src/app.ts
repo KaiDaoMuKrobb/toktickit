@@ -6,6 +6,7 @@ import fs from "fs";
 import cookieParser from "cookie-parser";
 import { getPrisma } from "./prisma.js";
 import authRoutes from "./routes/auth.routes.js";
+import { authenticate, requireRole } from "./middleware/auth.js";
 
 // Ensure uploads directory exists
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -100,7 +101,7 @@ app.get("/api/systems", async (_req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 app.get("/api/requesters", async (_req: Request, res: Response) => {
   try {
-    const requesters = await getPrisma().requesterUser.findMany({
+    const requesters = await getPrisma().user.findMany({
       where: { isActive: true },
       orderBy: { name: "asc" },
       select: { id: true, name: true, email: true },
@@ -115,13 +116,9 @@ app.get("/api/requesters", async (_req: Request, res: Response) => {
 // Lab 2 — Ticket Creation
 // POST /api/tickets
 // ---------------------------------------------------------------------------
-app.post("/api/tickets", async (req: Request, res: Response) => {
+app.post("/api/tickets", authenticate, requireRole(["Requester"]), async (req: Request, res: Response) => {
   try {
-    const requesterIdHeader = req.headers["x-development-requester-id"];
-    if (!requesterIdHeader) {
-      return res.status(401).json({ error: "Missing X-Development-Requester-Id header" });
-    }
-    const requesterId = parseInt(requesterIdHeader as string, 10);
+    const requesterId = req.user!.id;
     
     const { summary, description, categoryId, relatedSystemId } = req.body;
     
@@ -168,13 +165,9 @@ app.post("/api/tickets", async (req: Request, res: Response) => {
 // Lab 2 — My Tickets List
 // GET /api/tickets
 // ---------------------------------------------------------------------------
-app.get("/api/tickets", async (req: Request, res: Response) => {
+app.get("/api/tickets", authenticate, requireRole(["Requester"]), async (req: Request, res: Response) => {
   try {
-    const requesterIdHeader = req.headers["x-development-requester-id"];
-    if (!requesterIdHeader) {
-      return res.status(401).json({ error: "Missing X-Development-Requester-Id header" });
-    }
-    const requesterId = parseInt(requesterIdHeader as string, 10);
+    const requesterId = req.user!.id;
 
     const { search, category, status, page = "1", limit = "10" } = req.query;
 
@@ -241,22 +234,9 @@ app.get("/api/tickets", async (req: Request, res: Response) => {
 // Lab 2 — Ticket Detail and Attachments (Issue 21)
 // ---------------------------------------------------------------------------
 
-// Helper function to verify requester
-const getRequesterId = (req: Request, res: Response) => {
-  const requesterIdHeader = req.headers["x-development-requester-id"];
-  if (!requesterIdHeader) {
-    res.status(401).json({ error: "Missing X-Development-Requester-Id header" });
-    return null;
-  }
-  return parseInt(requesterIdHeader as string, 10);
-};
-
 // 1. Get Ticket Detail
-app.get("/api/tickets/:id", async (req: Request, res: Response) => {
+app.get("/api/tickets/:id", authenticate, async (req: Request, res: Response) => {
   try {
-    const requesterId = getRequesterId(req, res);
-    if (!requesterId) return;
-
     const ticketId = parseInt(req.params.id, 10);
     const prisma = getPrisma();
 
@@ -273,7 +253,10 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
     });
 
     if (!ticket) return res.status(404).json({ error: "Ticket not found" });
-    if (ticket.requesterId !== requesterId) return res.status(403).json({ error: "Forbidden" });
+
+    if (req.user!.role === "Requester") {
+      if (ticket.requesterId !== req.user!.id) return res.status(403).json({ error: "Forbidden" });
+    }
 
     res.status(200).json({
       ...ticket,
@@ -286,7 +269,7 @@ app.get("/api/tickets/:id", async (req: Request, res: Response) => {
 });
 
 // 2. Upload Attachment
-app.post("/api/tickets/:id/attachments", (req: Request, res: Response, next) => {
+app.post("/api/tickets/:id/attachments", authenticate, requireRole(["Requester"]), (req: Request, res: Response, next) => {
   upload.single("file")(req, res, function (err) {
     if (err) {
       // Handle multer errors (e.g. file size, invalid type)
@@ -296,8 +279,7 @@ app.post("/api/tickets/:id/attachments", (req: Request, res: Response, next) => 
   });
 }, async (req: Request, res: Response) => {
   try {
-    const requesterId = getRequesterId(req, res);
-    if (!requesterId) return;
+    const requesterId = req.user!.id;
 
     const ticketId = parseInt(req.params.id, 10);
     const file = req.file;
@@ -340,11 +322,8 @@ app.post("/api/tickets/:id/attachments", (req: Request, res: Response, next) => 
 });
 
 // 3. Download Attachment
-app.get("/api/attachments/:id/download", async (req: Request, res: Response) => {
+app.get("/api/attachments/:id/download", authenticate, async (req: Request, res: Response) => {
   try {
-    const requesterId = getRequesterId(req, res);
-    if (!requesterId) return;
-
     const attachmentId = parseInt(req.params.id, 10);
     const prisma = getPrisma();
 
@@ -354,7 +333,11 @@ app.get("/api/attachments/:id/download", async (req: Request, res: Response) => 
     });
 
     if (!attachment) return res.status(404).json({ error: "Attachment not found" });
-    if (attachment.ticket.requesterId !== requesterId) return res.status(403).json({ error: "Forbidden" });
+    
+    if (req.user!.role === "Requester") {
+      if (attachment.ticket.requesterId !== req.user!.id) return res.status(403).json({ error: "Forbidden" });
+    }
+    
     if (attachment.isRemoved) return res.status(410).json({ error: "Attachment has been removed" });
 
     const filePath = path.join(uploadDir, attachment.filename);
@@ -370,10 +353,9 @@ app.get("/api/attachments/:id/download", async (req: Request, res: Response) => 
 });
 
 // 4. Soft-remove Attachment
-app.delete("/api/tickets/:ticketId/attachments/:attachmentId", async (req: Request, res: Response) => {
+app.delete("/api/tickets/:ticketId/attachments/:attachmentId", authenticate, requireRole(["Requester"]), async (req: Request, res: Response) => {
   try {
-    const requesterId = getRequesterId(req, res);
-    if (!requesterId) return;
+    const requesterId = req.user!.id;
 
     const ticketId = parseInt(req.params.ticketId, 10);
     const attachmentId = parseInt(req.params.attachmentId, 10);

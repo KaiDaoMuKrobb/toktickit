@@ -40,7 +40,7 @@ describe("AttachmentSection Component", () => {
     await waitFor(() => {
       expect(mockOnChanged).toHaveBeenCalled();
     });
-    expect(globalThis.fetch).toHaveBeenCalledWith("http://localhost:3000/api/tickets/1/attachments/1", expect.objectContaining({ method: "DELETE" }));
+    expect(globalThis.fetch).toHaveBeenCalledWith("/api/tickets/1/attachments/1", expect.objectContaining({ method: "DELETE" }));
   });
 
   it("should reject large files locally", async () => {
