@@ -34,13 +34,18 @@ model RelatedSystem {
   tickets   Ticket[]
 }
 
-model RequesterUser {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  tickets   Ticket[]
+model User {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  email              String   @unique
+  role               String   @default("Requester")
+  passwordHash       String   @default("")
+  mustChangePassword Boolean  @default(true)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  tickets            Ticket[]
+
+  @@map("RequesterUser")
 }
 
 model Ticket {
@@ -59,7 +64,7 @@ model Ticket {
   relatedSystem   RelatedSystem @relation(fields: [relatedSystemId], references: [id])
   
   requesterId   Int
-  requester     RequesterUser @relation(fields: [requesterId], references: [id])
+  requester     User @relation(fields: [requesterId], references: [id])
   
   attachments   Attachment[]
 }

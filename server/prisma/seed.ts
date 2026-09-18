@@ -1,4 +1,5 @@
 import { getPrisma } from "../src/prisma.js";
+import bcrypt from "bcrypt";
 
 // Issue 3 — seed the four supported categories.
 // The four names are: Account and Access, Hardware, Software, Network.
@@ -38,23 +39,35 @@ async function main() {
     });
   }
 
-  const requesters = [
-    { name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true },
-    { name: "Michael Brown", email: "michael@example.com", isActive: true },
-    { name: "Sarah Johnson", email: "sarah@example.com", isActive: true },
-    { name: "David Lee", email: "david@example.com", isActive: true },
-    { name: "Inactive User", email: "inactive@example.com", isActive: false },
+  const passwordHash = await bcrypt.hash("password123", 10);
+
+  const users = [
+    // Requesters
+    { name: "Jennifer Anderson", email: "jennifer@example.com", isActive: true, role: "Requester", passwordHash, mustChangePassword: false },
+    { name: "Michael Brown", email: "michael@example.com", isActive: true, role: "Requester", passwordHash, mustChangePassword: false },
+    { name: "Sarah Johnson", email: "sarah@example.com", isActive: true, role: "Requester", passwordHash, mustChangePassword: false },
+    { name: "David Lee", email: "david@example.com", isActive: true, role: "Requester", passwordHash, mustChangePassword: false },
+    { name: "Inactive Requester", email: "inactive_req@example.com", isActive: false, role: "Requester", passwordHash, mustChangePassword: false },
+    // IT Staff
+    { name: "IT Staff One", email: "it1@example.com", isActive: true, role: "IT Staff", passwordHash, mustChangePassword: false },
+    { name: "IT Staff Two", email: "it2@example.com", isActive: true, role: "IT Staff", passwordHash, mustChangePassword: false },
+    { name: "IT Staff Three", email: "it3@example.com", isActive: true, role: "IT Staff", passwordHash, mustChangePassword: false },
+    { name: "Inactive IT", email: "inactive_it@example.com", isActive: false, role: "IT Staff", passwordHash, mustChangePassword: false },
+    // Administrators
+    { name: "Admin Boss", email: "admin@example.com", isActive: true, role: "Administrator", passwordHash, mustChangePassword: false },
+    // Test First-Login User
+    { name: "New User", email: "newuser@example.com", isActive: true, role: "Requester", passwordHash, mustChangePassword: true },
   ];
 
-  for (const req of requesters) {
-    await prisma.requesterUser.upsert({
-      where: { email: req.email },
-      update: req,
-      create: req
+  for (const user of users) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: user,
+      create: user
     });
   }
 
-  console.log("Categories and Requesters seeded successfully!");
+  console.log("Categories, Systems, and Users seeded successfully!");
 }
 
 main()
