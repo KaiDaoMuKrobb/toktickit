@@ -296,11 +296,14 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
                   <p className="text-muted text-center py-4">No comments or notes yet.</p>
                 ) : (
                   communications.map((comm) => (
-                    <div key={`${comm.type}-${comm.id}`} className={`p-3 rounded mb-3 border ${comm.type === 'internal_note' ? 'bg-warning bg-opacity-10 border-warning' : 'bg-light'}`}>
+                    <div key={`${comm.type}-${comm.id}`} className="p-3 rounded mb-3 border" style={{ backgroundColor: comm.type === 'internal_note' ? '#FFF8E1' : '#EAF6EF' }}>
                       <div className="d-flex justify-content-between align-items-center mb-2">
                         <div>
                           <strong className="me-2">{comm.author.name}</strong>
-                          <span className={`badge ${comm.author.role === 'IT Staff' ? 'bg-success bg-opacity-10 text-success' : comm.author.role === 'Administrator' ? 'bg-dark bg-opacity-10 text-dark' : 'bg-primary bg-opacity-10 text-primary'}`}>{comm.author.role}</span>
+                          <span className="badge" style={{
+                            backgroundColor: comm.author.role === 'Requester' ? '#E3F2FD' : comm.author.role === 'IT Staff' ? '#0B7A46' : '#37474F',
+                            color: comm.author.role === 'Requester' ? '#000' : '#fff'
+                          }}>{comm.author.role}</span>
                           {comm.type === 'internal_note' && <span className="badge bg-warning text-dark ms-2">Internal Note</span>}
                         </div>
                         <small className="text-muted">{new Date(comm.createdAt).toLocaleString()}</small>

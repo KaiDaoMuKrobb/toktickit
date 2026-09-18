@@ -33,13 +33,13 @@ function AppContent() {
     return <ChangePassword />;
   }
 
-  // Get badge color based on role
-  const getRoleBadgeColor = (role: string) => {
+  // Get badge style based on role
+  const getRoleBadgeStyle = (role: string) => {
     switch (role) {
-      case "Requester": return "bg-primary bg-opacity-10 text-primary border-primary";
-      case "IT Staff": return "bg-success bg-opacity-10 text-success border-success";
-      case "Administrator": return "bg-dark bg-opacity-10 text-dark border-dark";
-      default: return "bg-secondary bg-opacity-10 text-secondary border-secondary";
+      case "Requester": return { backgroundColor: "#E3F2FD", color: "#000" };
+      case "IT Staff": return { backgroundColor: "#0B7A46", color: "#fff" };
+      case "Administrator": return { backgroundColor: "#37474F", color: "#fff" };
+      default: return { backgroundColor: "#6c757d", color: "#fff" };
     }
   };
 
@@ -81,7 +81,7 @@ function AppContent() {
           )}
           <div className="d-flex align-items-center bg-light rounded-pill px-3 py-1 border">
             <span className="text-muted small me-2 fw-bold">{user.name}</span>
-            <span className={`badge border ${getRoleBadgeColor(user.role)} rounded-pill me-2`}>
+            <span className="badge rounded-pill me-2" style={getRoleBadgeStyle(user.role)}>
               {user.role}
             </span>
             <button 
