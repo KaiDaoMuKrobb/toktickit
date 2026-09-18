@@ -261,15 +261,19 @@ export function UserManagement() {
                   </select>
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="create-password" className="form-label">Initial Password</label>
-                  <input id="create-password" type="password" className="form-control" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} required minLength={8} />
-                </div>
-                <div className="mb-3">
                   <label className="form-label">Active</label>
                   <div className="form-check form-switch fs-5">
                     <input type="checkbox" className="form-check-input" id="isActiveCheck" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} />
                     <label className="form-check-label ms-2 fs-6" htmlFor="isActiveCheck">{formData.isActive ? 'Yes' : 'No'}</label>
                   </div>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="create-password" className="form-label">Initial Password <span className="text-danger">*</span></label>
+                  <div className="input-group">
+                    <input id="create-password" type="password" className="form-control" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} required minLength={8} />
+                    <button type="button" className="btn btn-outline-secondary" onClick={() => setFormData({ ...formData, password: Math.random().toString(36).slice(-8) })}>Auto-Generate</button>
+                  </div>
+                  <small className="text-muted">Must be at least 8 characters. User will be required to change it.</small>
                 </div>
               </div>
               <div className="modal-footer">

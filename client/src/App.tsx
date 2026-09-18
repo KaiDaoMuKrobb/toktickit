@@ -68,7 +68,7 @@ function AppContent() {
               className={`btn ${currentView === "admin" ? "btn-dark" : "btn-outline-dark"}`} 
               onClick={() => setCurrentView("admin")}
             >
-              Admin Panel
+              Admin
             </button>
           )}
           {currentView === "home" && (

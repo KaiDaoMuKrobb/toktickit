@@ -76,7 +76,7 @@ describe("UserManagement Component", () => {
     fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: "New User" } });
     fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: "new@example.com" } });
     fireEvent.change(screen.getByLabelText(/Role/i), { target: { value: "Requester" } });
-    fireEvent.change(screen.getByLabelText("Initial Password"), { target: { value: "password123" } });
+    fireEvent.change(screen.getByLabelText(/Initial Password/i), { target: { value: "password123" } });
 
     // Submit form
     fireEvent.click(screen.getByRole("button", { name: "Create User" }));
