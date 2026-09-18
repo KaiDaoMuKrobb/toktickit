@@ -20,7 +20,7 @@ vi.mock("../../src/AuthContext.js", async (importOriginal) => {
 });
 
 // Mock global fetch to prevent components rendered by App (like MyTickets) from making actual network requests
-global.fetch = vi.fn((url: string) => {
+globalThis.fetch = vi.fn((url: string) => {
   if (url.includes("/api/categories") || url.includes("/api/requesters")) {
     return Promise.resolve({
       ok: true,

@@ -4,11 +4,11 @@ import { AttachmentSection } from "../../src/components/AttachmentSection.js";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
 // Mock global fetch
-global.fetch = vi.fn();
-global.prompt = vi.fn();
-global.alert = vi.fn();
-global.URL.createObjectURL = vi.fn();
-global.URL.revokeObjectURL = vi.fn();
+globalThis.fetch = vi.fn();
+window.prompt = vi.fn() as any;
+window.alert = vi.fn() as any;
+globalThis.URL.createObjectURL = vi.fn();
+globalThis.URL.revokeObjectURL = vi.fn();
 
 describe("AttachmentSection Component", () => {
   const mockAttachments = [
@@ -26,8 +26,8 @@ describe("AttachmentSection Component", () => {
 
   it("should handle soft removal", async () => {
     const mockOnChanged = vi.fn();
-    (global.prompt as any).mockReturnValueOnce("Wrong file");
-    (global.fetch as any).mockResolvedValueOnce({
+    (window.prompt as any).mockReturnValueOnce("Wrong file");
+    (globalThis.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ message: "Removed" })
     });
@@ -40,7 +40,7 @@ describe("AttachmentSection Component", () => {
     await waitFor(() => {
       expect(mockOnChanged).toHaveBeenCalled();
     });
-    expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/api/tickets/1/attachments/1", expect.objectContaining({ method: "DELETE" }));
+    expect(globalThis.fetch).toHaveBeenCalledWith("http://localhost:3000/api/tickets/1/attachments/1", expect.objectContaining({ method: "DELETE" }));
   });
 
   it("should reject large files locally", async () => {
@@ -51,7 +51,7 @@ describe("AttachmentSection Component", () => {
     
     fireEvent.change(input, { target: { files: [file] } });
     
-    expect(global.alert).toHaveBeenCalledWith("File is too large. Maximum size is 5MB.");
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(window.alert).toHaveBeenCalledWith("File is too large. Maximum size is 5MB.");
+    expect(globalThis.fetch).not.toHaveBeenCalled();
   });
 });

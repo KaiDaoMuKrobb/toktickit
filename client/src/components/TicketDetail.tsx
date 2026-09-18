@@ -17,7 +17,7 @@ interface TicketDetailData {
   ticketNumber: string;
   summary: string;
   description: string;
-  relatedSystem: string;
+  relatedSystem: { id: number; name: string };
   currentStatus: string;
   updatedAt: string;
   createdAt: string;

@@ -2,10 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MyTickets } from "../../src/components/MyTickets.js";
 import App from "../../src/App.js";
-
-// Mock the global fetch
-global.fetch = vi.fn();
-
 import * as AuthContext from "../../src/AuthContext.js";
 
 // Mock the AuthContext so that the app renders as an unauthenticated user by default
@@ -22,6 +18,9 @@ vi.mock("../../src/AuthContext.js", async (importOriginal) => {
   };
 });
 
+// Mock the global fetch
+globalThis.fetch = vi.fn();
+
 describe("MyTickets Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -29,7 +28,7 @@ describe("MyTickets Component", () => {
 
   it("should show 'No matching tickets found' when search yields empty results (UI-03, AC-10)", async () => {
     // Mock the initial fetch and search fetch to return 0 tickets
-    (global.fetch as any).mockImplementation((url: string) => {
+    (globalThis.fetch as any).mockImplementation((url: string) => {
       if (url.includes("/api/categories")) {
         return Promise.resolve({
           ok: true,
@@ -64,7 +63,7 @@ describe("MyTickets Component", () => {
     // Enter search term and submit
     const searchInput = screen.getByPlaceholderText(/Search by summary/i);
     fireEvent.change(searchInput, { target: { value: "nonexistent" } });
-    
+
     const searchBtn = screen.getByRole("button", { name: /Search/i });
     fireEvent.click(searchBtn);
 
