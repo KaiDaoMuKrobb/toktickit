@@ -14,7 +14,6 @@ export function UserManagement() {
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showResetModal, setShowResetModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -92,6 +91,19 @@ export function UserManagement() {
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to update user");
       }
+      
+      if (formData.password) {
+        const pwRes = await fetch(`/api/users/${selectedUser.id}/reset-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newPassword: formData.password })
+        });
+        if (!pwRes.ok) {
+          const errorData = await pwRes.json();
+          throw new Error("User updated, but failed to reset password: " + (errorData.error || ""));
+        }
+      }
+
       setShowEditModal(false);
       fetchUsers();
     } catch (err: any) {
@@ -101,28 +113,7 @@ export function UserManagement() {
     }
   };
 
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrorMsg("");
-    try {
-      const res = await fetch(`/api/users/${selectedUser.id}/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ newPassword: formData.password })
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to reset password");
-      }
-      setShowResetModal(false);
-      alert("Password reset successfully.");
-    } catch (err: any) {
-      setErrorMsg(err.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+
 
   const handleToggleActive = async (userToToggle: any) => {
     if (userToToggle.id === user?.id && userToToggle.isActive) {
@@ -158,12 +149,7 @@ export function UserManagement() {
     setShowEditModal(true);
   };
 
-  const openResetModal = (u: any) => {
-    setSelectedUser(u);
-    setFormData({ ...formData, password: "" });
-    setErrorMsg("");
-    setShowResetModal(true);
-  };
+
 
   if (user?.role !== "Administrator") {
     return <div className="alert alert-danger mt-4">Access Denied: Administrators only.</div>;
@@ -236,8 +222,7 @@ export function UserManagement() {
                     </div>
                   </td>
                   <td>
-                    <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => openEditModal(u)}>Edit</button>
-                    <button className="btn btn-sm btn-outline-warning" onClick={() => openResetModal(u)}>Reset PW</button>
+                    <button className="btn btn-sm btn-outline-secondary" onClick={() => openEditModal(u)}>Edit</button>
                   </td>
                 </tr>
               ))}
@@ -342,6 +327,15 @@ export function UserManagement() {
                     <label className="form-check-label ms-2 fs-6" htmlFor="isActiveCheckEdit">{formData.isActive ? 'Yes' : 'No'}</label>
                   </div>
                 </div>
+                <hr />
+                <div className="mb-3">
+                  <label htmlFor="edit-password" className="form-label">Set New Initial Password</label>
+                  <div className="input-group">
+                    <input id="edit-password" type="password" className="form-control" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} minLength={8} placeholder="Leave blank to keep current password" />
+                    <button type="button" className="btn btn-outline-secondary" onClick={() => setFormData({ ...formData, password: Math.random().toString(36).slice(-8) })}>Auto-Generate</button>
+                  </div>
+                  <small className="text-muted">If provided, the user's password will be reset and they must change it upon next login.</small>
+                </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
@@ -354,32 +348,6 @@ export function UserManagement() {
         </div>
       )}
 
-      {showResetModal && selectedUser && (
-        <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog">
-            <form className="modal-content" onSubmit={handleResetPassword}>
-              <div className="modal-header">
-                <h5 className="modal-title">Reset Password for {selectedUser.email}</h5>
-                <button type="button" className="btn-close" onClick={() => setShowResetModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                {errorMsg && <div className="alert alert-danger py-2">{errorMsg}</div>}
-                <div className="mb-3">
-                  <label htmlFor="reset-password" className="form-label">New Password <span className="text-danger">*</span></label>
-                  <input id="reset-password" type="password" className="form-control" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} required minLength={8} />
-                  <small className="text-muted">User will be required to change this upon next login.</small>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowResetModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-danger" disabled={isSubmitting}>
-                  {isSubmitting ? "Resetting..." : "Reset Password"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
