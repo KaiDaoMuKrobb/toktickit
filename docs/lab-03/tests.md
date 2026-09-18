@@ -10,13 +10,13 @@ We continue using Test-Driven Development (TDD) for unit, API, and UI component 
 | API-01 | API | AC-01, FR-01 | Valid login | HTTP 200, HTTP-Only Cookie set, returns user data | `server/tests/lab-03/auth.api.test.ts` | Pend |
 | API-02 | API | FR-01 | Invalid login | HTTP 401 Unauthorized | `server/tests/lab-03/auth.api.test.ts` | Pend |
 | API-03 | API | AC-04, FR-06 | Requester requests Internal Notes | HTTP 403 Forbidden; no note data returned | `server/tests/lab-03/comments-notes.api.test.ts` | Pend |
-| API-04 | API | AC-05, BR-08 | Admin self-deactivation | HTTP 400 Bad Request; validation failure | `server/tests/lab-03/users-admin.api.test.ts` | Pend |
+| API-04 | API | AC-05, BR-08 | Admin self-deactivation | HTTP 400 Bad Request; validation failure | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | API-05 | API | AC-06, FR-04 | IT Staff queue retrieval | Paginated list of tickets returned | `server/tests/lab-03/staff-queue.api.test.ts` | Pend |
 | API-06 | API | AC-07, FR-05 | IT Staff claims unassigned ticket | HTTP 200, owner updated, status changed to Open | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pend |
-| API-07 | API | BR-09 | Create duplicate email user | HTTP 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pend |
+| API-07 | API | BR-09 | Create duplicate email user | HTTP 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | UI-01 | UI | AC-02, BR-02 | First login forced password change | App renders Change Password screen, blocks other routes | `client/tests/lab-03/Login.test.tsx` | Pend |
 | UI-02 | UI | AC-09, FR-03 | Requester clicks Problem Resolved | Posts a Public Comment and alerts IT Staff | `client/tests/lab-03/RequesterTicketDetail.test.tsx` | Pend |
-| UI-03 | UI | FR-07 | Admin creates new user | Form submits, modal closes, user list updates | `client/tests/lab-03/UserManagement.test.tsx` | Pend |
+| UI-03 | UI | FR-07 | Admin creates new user | Form submits, modal closes, user list updates | `client/tests/lab-03/UserManagement.test.tsx` | Pass |
 | E2E-01 | E2E | AC-01, AC-03 | Authentication and Requester Regression | Requester logs in, creates ticket, views only own tickets | `e2e/lab-03/authentication.spec.ts` | Pend |
 | E2E-02 | E2E | AC-02 | Initial password login and change | Normal app opens only after valid change | `e2e/lab-03/first-login.spec.ts` | Pend |
 | E2E-03 | E2E | FR-04, FR-05 | Staff ticket flow | Staff logs in, views queue, claims ticket, posts internal note | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pend |
