@@ -365,7 +365,7 @@ export function UserManagement() {
               <div className="modal-body">
                 {errorMsg && <div className="alert alert-danger py-2">{errorMsg}</div>}
                 <div className="mb-3">
-                  <label htmlFor="reset-password" className="form-label">New Password</label>
+                  <label htmlFor="reset-password" className="form-label">New Password <span className="text-danger">*</span></label>
                   <input id="reset-password" type="password" className="form-control" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} required minLength={8} />
                   <small className="text-muted">User will be required to change this upon next login.</small>
                 </div>
