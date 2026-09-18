@@ -6,6 +6,10 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 // Mock fetch globally so we don't make real network requests during tests
 globalThis.fetch = vi.fn();
 
+vi.mock("../../src/AuthContext.js", () => ({
+  useAuth: () => ({ user: { id: 1, role: "Requester" } })
+}));
+
 describe("RequesterTicketDetail Component", () => {
   // Define mock data that represents a standard ticket response from the API
   const mockTicketData = {
@@ -36,6 +40,9 @@ describe("RequesterTicketDetail Component", () => {
     (globalThis.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => mockTicketData
+    }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => []
     });
 
     // 2. Act: Render the TicketDetail component
@@ -60,6 +67,9 @@ describe("RequesterTicketDetail Component", () => {
     (globalThis.fetch as any).mockResolvedValueOnce({
       ok: false,
       json: async () => ({ error: "Not Found" })
+    }).mockResolvedValueOnce({
+      ok: true,
+      json: async () => []
     });
 
     // 2. Act: Render the component with an invalid ticket ID

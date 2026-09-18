@@ -386,5 +386,139 @@ app.delete("/api/tickets/:ticketId/attachments/:attachmentId", authenticate, req
 });
 
 // ---------------------------------------------------------------------------
+// Lab 3 - IT Staff Ticket Operations (Issue 35)
+// ---------------------------------------------------------------------------
+
+app.patch("/api/tickets/:id", authenticate, requireRole(["IT Staff", "Administrator"]), async (req: Request, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    const { ownerId, itPriority, status } = req.body;
+    const prisma = getPrisma();
+
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    const validStatuses = ["New", "Open", "In Progress", "Waiting for Requester", "Resolved", "Closed", "Reopened", "Cancelled"];
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Invalid status" });
+    }
+
+    const updatedTicket = await prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        ownerId: ownerId !== undefined ? ownerId : undefined,
+        itPriority: itPriority !== undefined ? itPriority : undefined,
+        status: status !== undefined ? status : undefined,
+      }
+    });
+
+    res.status(200).json(updatedTicket);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/tickets/:id/comments", authenticate, async (req: Request, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    const { content, isResolutionIndication } = req.body;
+    const prisma = getPrisma();
+
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    if (req.user!.role === "Requester" && ticket.requesterId !== req.user!.id) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    
+    if (!content) return res.status(400).json({ error: "Content is required" });
+
+    const comment = await prisma.publicComment.create({
+      data: {
+        content,
+        authorId: req.user!.id,
+        ticketId
+      },
+      include: { author: { select: { name: true, role: true } } }
+    });
+
+    if (isResolutionIndication && req.user!.role === "Requester") {
+      await prisma.ticket.update({
+        where: { id: ticketId },
+        data: { requesterResolved: true }
+      });
+    }
+
+    res.status(201).json(comment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/tickets/:id/notes", authenticate, requireRole(["IT Staff", "Administrator"]), async (req: Request, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    const { content } = req.body;
+    const prisma = getPrisma();
+
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    if (!content) return res.status(400).json({ error: "Content is required" });
+
+    const note = await prisma.internalNote.create({
+      data: {
+        content,
+        authorId: req.user!.id,
+        ticketId
+      },
+      include: { author: { select: { name: true, role: true } } }
+    });
+
+    res.status(201).json(note);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/api/tickets/:id/communications", authenticate, async (req: Request, res: Response) => {
+  try {
+    const ticketId = parseInt(req.params.id, 10);
+    const prisma = getPrisma();
+
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+
+    if (req.user!.role === "Requester" && ticket.requesterId !== req.user!.id) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const comments = await prisma.publicComment.findMany({
+      where: { ticketId },
+      include: { author: { select: { name: true, role: true } } }
+    });
+
+    let communications: any[] = comments.map(c => ({ ...c, type: 'public_comment' }));
+
+    if (req.user!.role === "IT Staff" || req.user!.role === "Administrator") {
+      const notes = await prisma.internalNote.findMany({
+        where: { ticketId },
+        include: { author: { select: { name: true, role: true } } }
+      });
+      const notesMapped = notes.map(n => ({ ...n, type: 'internal_note' }));
+      communications = [...communications, ...notesMapped];
+    }
+
+    communications.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    res.status(200).json(communications);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 export default app;
