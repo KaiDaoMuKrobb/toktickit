@@ -73,9 +73,9 @@ describe("UserManagement Component", () => {
     expect(screen.getByText("Initial Password")).toBeInTheDocument();
 
     // Fill form
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "New User" } });
-    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "new@example.com" } });
-    fireEvent.change(screen.getByLabelText("Role"), { target: { value: "Requester" } });
+    fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: "New User" } });
+    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: "new@example.com" } });
+    fireEvent.change(screen.getByLabelText(/Role/i), { target: { value: "Requester" } });
     fireEvent.change(screen.getByLabelText("Initial Password"), { target: { value: "password123" } });
 
     // Submit form

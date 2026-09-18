@@ -202,21 +202,25 @@ export function UserManagement() {
                   <td>{u.id}</td>
                   <td>{u.name}</td>
                   <td>{u.email}</td>
-                  <td>{u.role}</td>
                   <td>
-                    <span className={`badge ${u.isActive ? "bg-success" : "bg-danger"}`}>
-                      {u.isActive ? "Active" : "Inactive"}
-                    </span>
+                    {u.role === 'Requester' && <span className="badge text-dark" style={{ backgroundColor: '#E3F2FD' }}>Requester</span>}
+                    {u.role === 'IT Staff' && <span className="badge text-white" style={{ backgroundColor: '#0B7A46' }}>IT Staff</span>}
+                    {u.role === 'Administrator' && <span className="badge text-white" style={{ backgroundColor: '#37474F' }}>Administrator</span>}
+                  </td>
+                  <td>
+                    <div className="form-check form-switch d-inline-block">
+                      <input 
+                        type="checkbox" 
+                        className="form-check-input" 
+                        checked={u.isActive} 
+                        onChange={() => handleToggleActive(u)} 
+                        title={u.isActive ? "Deactivate User" : "Activate User"}
+                      />
+                    </div>
                   </td>
                   <td>
                     <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => openEditModal(u)}>Edit</button>
-                    <button className="btn btn-sm btn-outline-warning me-2" onClick={() => openResetModal(u)}>Reset PW</button>
-                    <button
-                      className={`btn btn-sm ${u.isActive ? 'btn-outline-danger' : 'btn-outline-success'}`}
-                      onClick={() => handleToggleActive(u)}
-                    >
-                      {u.isActive ? "Deactivate" : "Activate"}
-                    </button>
+                    <button className="btn btn-sm btn-outline-warning" onClick={() => openResetModal(u)}>Reset PW</button>
                   </td>
                 </tr>
               ))}
@@ -241,15 +245,15 @@ export function UserManagement() {
               </div>
               <div className="modal-body">
                 <div className="mb-3">
-                  <label htmlFor="create-name" className="form-label">Name</label>
+                  <label htmlFor="create-name" className="form-label">Full Name <span className="text-danger">*</span></label>
                   <input id="create-name" type="text" className="form-control" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="create-email" className="form-label">Email</label>
+                  <label htmlFor="create-email" className="form-label">Email Address <span className="text-danger">*</span></label>
                   <input id="create-email" type="email" className="form-control" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="create-role" className="form-label">Role</label>
+                  <label htmlFor="create-role" className="form-label">Role <span className="text-danger">*</span></label>
                   <select id="create-role" className="form-select" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
                     <option value="Requester">Requester</option>
                     <option value="IT Staff">IT Staff</option>
@@ -260,9 +264,12 @@ export function UserManagement() {
                   <label htmlFor="create-password" className="form-label">Initial Password</label>
                   <input id="create-password" type="password" className="form-control" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} required minLength={8} />
                 </div>
-                <div className="form-check">
-                  <input type="checkbox" className="form-check-input" id="isActiveCheck" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} />
-                  <label className="form-check-label" htmlFor="isActiveCheck">Active Account</label>
+                <div className="mb-3">
+                  <label className="form-label">Active</label>
+                  <div className="form-check form-switch fs-5">
+                    <input type="checkbox" className="form-check-input" id="isActiveCheck" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} />
+                    <label className="form-check-label ms-2 fs-6" htmlFor="isActiveCheck">{formData.isActive ? 'Yes' : 'No'}</label>
+                  </div>
                 </div>
               </div>
               <div className="modal-footer">
@@ -284,24 +291,27 @@ export function UserManagement() {
               </div>
               <div className="modal-body">
                 <div className="mb-3">
-                  <label htmlFor="edit-name" className="form-label">Name</label>
+                  <label htmlFor="edit-name" className="form-label">Full Name <span className="text-danger">*</span></label>
                   <input id="edit-name" type="text" className="form-control" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="edit-email" className="form-label">Email</label>
+                  <label htmlFor="edit-email" className="form-label">Email Address <span className="text-danger">*</span></label>
                   <input id="edit-email" type="email" className="form-control" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="edit-role" className="form-label">Role</label>
+                  <label htmlFor="edit-role" className="form-label">Role <span className="text-danger">*</span></label>
                   <select id="edit-role" className="form-select" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
                     <option value="Requester">Requester</option>
                     <option value="IT Staff">IT Staff</option>
                     <option value="Administrator">Administrator</option>
                   </select>
                 </div>
-                <div className="form-check">
-                  <input type="checkbox" className="form-check-input" id="isActiveCheckEdit" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} />
-                  <label className="form-check-label" htmlFor="isActiveCheckEdit">Active Account</label>
+                <div className="mb-3">
+                  <label className="form-label">Active</label>
+                  <div className="form-check form-switch fs-5">
+                    <input type="checkbox" className="form-check-input" id="isActiveCheckEdit" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} />
+                    <label className="form-check-label ms-2 fs-6" htmlFor="isActiveCheckEdit">{formData.isActive ? 'Yes' : 'No'}</label>
+                  </div>
                 </div>
               </div>
               <div className="modal-footer">
