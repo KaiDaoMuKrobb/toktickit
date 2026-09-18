@@ -3,7 +3,9 @@ import cors from "cors";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import cookieParser from "cookie-parser";
 import { getPrisma } from "./prisma.js";
+import authRoutes from "./routes/auth.routes.js";
 
 // Ensure uploads directory exists
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -45,6 +47,9 @@ export const app = express();
 
 app.use(cors());          // already wired: lets the Vite dev server call this API
 app.use(express.json());
+app.use(cookieParser());
+
+app.use("/api/auth", authRoutes);
 
 // ---------------------------------------------------------------------------
 // Issue 2 — API health check
