@@ -16,6 +16,8 @@ export function UserManagement() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   // Form states
   const [formData, setFormData] = useState({
@@ -50,6 +52,8 @@ export function UserManagement() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMsg("");
     try {
       const res = await fetch("/api/users", {
         method: "POST",
@@ -63,12 +67,16 @@ export function UserManagement() {
       setShowCreateModal(false);
       fetchUsers();
     } catch (err: any) {
-      alert(err.message);
+      setErrorMsg(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMsg("");
     try {
       const res = await fetch(`/api/users/${selectedUser.id}`, {
         method: "PATCH",
@@ -87,12 +95,16 @@ export function UserManagement() {
       setShowEditModal(false);
       fetchUsers();
     } catch (err: any) {
-      alert(err.message);
+      setErrorMsg(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMsg("");
     try {
       const res = await fetch(`/api/users/${selectedUser.id}/reset-password`, {
         method: "POST",
@@ -106,7 +118,9 @@ export function UserManagement() {
       setShowResetModal(false);
       alert("Password reset successfully.");
     } catch (err: any) {
-      alert(err.message);
+      setErrorMsg(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -133,18 +147,21 @@ export function UserManagement() {
 
   const openCreateModal = () => {
     setFormData({ name: "", email: "", role: "Requester", isActive: true, password: "" });
+    setErrorMsg("");
     setShowCreateModal(true);
   };
 
   const openEditModal = (u: any) => {
     setSelectedUser(u);
     setFormData({ ...formData, name: u.name, email: u.email, role: u.role, isActive: u.isActive });
+    setErrorMsg("");
     setShowEditModal(true);
   };
 
   const openResetModal = (u: any) => {
     setSelectedUser(u);
     setFormData({ ...formData, password: "" });
+    setErrorMsg("");
     setShowResetModal(true);
   };
 
@@ -244,6 +261,7 @@ export function UserManagement() {
                 <button type="button" className="btn-close" onClick={() => setShowCreateModal(false)}></button>
               </div>
               <div className="modal-body">
+                {errorMsg && <div className="alert alert-danger py-2">{errorMsg}</div>}
                 <div className="mb-3">
                   <label htmlFor="create-name" className="form-label">Full Name <span className="text-danger">*</span></label>
                   <input id="create-name" type="text" className="form-control" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
@@ -275,10 +293,16 @@ export function UserManagement() {
                   </div>
                   <small className="text-muted">Must be at least 8 characters. User will be required to change it.</small>
                 </div>
+                <div className="form-check mb-3">
+                  <input type="checkbox" className="form-check-input" id="sendEmailCheck" defaultChecked />
+                  <label className="form-check-label" htmlFor="sendEmailCheck">Send password reset email (mock UI)</label>
+                </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Create User</button>
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                  {isSubmitting ? "Creating..." : "Create User"}
+                </button>
               </div>
             </form>
           </div>
@@ -294,6 +318,7 @@ export function UserManagement() {
                 <button type="button" className="btn-close" onClick={() => setShowEditModal(false)}></button>
               </div>
               <div className="modal-body">
+                {errorMsg && <div className="alert alert-danger py-2">{errorMsg}</div>}
                 <div className="mb-3">
                   <label htmlFor="edit-name" className="form-label">Full Name <span className="text-danger">*</span></label>
                   <input id="edit-name" type="text" className="form-control" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
@@ -320,7 +345,9 @@ export function UserManagement() {
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Changes</button>
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                  {isSubmitting ? "Saving..." : "Save Changes"}
+                </button>
               </div>
             </form>
           </div>
@@ -336,6 +363,7 @@ export function UserManagement() {
                 <button type="button" className="btn-close" onClick={() => setShowResetModal(false)}></button>
               </div>
               <div className="modal-body">
+                {errorMsg && <div className="alert alert-danger py-2">{errorMsg}</div>}
                 <div className="mb-3">
                   <label htmlFor="reset-password" className="form-label">New Password</label>
                   <input id="reset-password" type="password" className="form-control" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} required minLength={8} />
@@ -344,7 +372,9 @@ export function UserManagement() {
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowResetModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-danger">Reset Password</button>
+                <button type="submit" className="btn btn-danger" disabled={isSubmitting}>
+                  {isSubmitting ? "Resetting..." : "Reset Password"}
+                </button>
               </div>
             </form>
           </div>
