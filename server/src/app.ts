@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { getPrisma } from "./prisma.js";
 import authRoutes from "./routes/auth.routes.js";
 import { authenticate, requireRole } from "./middleware/auth.js";
+import bcrypt from "bcryptjs";
 
 // Ensure uploads directory exists
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -212,6 +213,82 @@ app.get("/api/tickets", authenticate, requireRole(["Requester"]), async (req: Re
       summary: t.summary,
       category: t.category,
       currentStatus: t.status,
+      updatedAt: t.updatedAt
+    }));
+
+    res.status(200).json({
+      data: formattedTickets,
+      meta: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Lab 3 — IT Staff Ticket Queue
+// GET /api/tickets/queue
+// ---------------------------------------------------------------------------
+app.get("/api/tickets/queue", authenticate, requireRole(["IT Staff", "Administrator"]), async (req: Request, res: Response) => {
+  try {
+    const { search, category, status, priority, page = "1", limit = "10" } = req.query;
+
+    const pageNum = parseInt(page as string, 10);
+    const limitNum = parseInt(limit as string, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { ticketNumber: { contains: search as string, mode: "insensitive" } },
+        { summary: { contains: search as string, mode: "insensitive" } }
+      ];
+    }
+    if (category) {
+      where.categoryId = parseInt(category as string, 10);
+    }
+    if (status) {
+      where.status = status as string;
+    }
+    if (priority) {
+      where.itPriority = priority as string;
+    }
+
+    const prisma = getPrisma();
+
+    const [tickets, total] = await Promise.all([
+      prisma.ticket.findMany({
+        where,
+        skip,
+        take: limitNum,
+        orderBy: { updatedAt: "desc" },
+        include: {
+          category: { select: { id: true, name: true } },
+          owner: { select: { id: true, name: true } },
+          requester: { select: { id: true, name: true } }
+        }
+      }),
+      prisma.ticket.count({ where })
+    ]);
+
+    const formattedTickets = tickets.map(t => ({
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      summary: t.summary,
+      category: t.category,
+      requestedPriority: t.requestedPriority,
+      itPriority: t.itPriority,
+      currentStatus: t.status,
+      owner: t.owner,
+      requester: t.requester,
+      createdAt: t.createdAt,
       updatedAt: t.updatedAt
     }));
 
@@ -515,6 +592,190 @@ app.get("/api/tickets/:id/communications", authenticate, async (req: Request, re
     communications.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
     res.status(200).json(communications);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Administrator Endpoints (User Management)
+// ---------------------------------------------------------------------------
+
+app.get("/api/users", authenticate, requireRole(["Administrator"]), async (req: Request, res: Response) => {
+  try {
+    const { search, role } = req.query;
+    const prisma = getPrisma();
+
+    const where: any = {};
+    if (search) {
+      where.OR = [
+        { name: { contains: search as string, mode: "insensitive" } },
+        { email: { contains: search as string, mode: "insensitive" } }
+      ];
+    }
+    if (role) {
+      where.role = role as string;
+    }
+
+    const users = await prisma.user.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        mustChangePassword: true,
+        createdAt: true
+      },
+      orderBy: { id: "asc" }
+    });
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/users", authenticate, requireRole(["Administrator"]), async (req: Request, res: Response) => {
+  try {
+    const { name, email, role, isActive, password } = req.body;
+    const prisma = getPrisma();
+
+    if (!name || !email || !role || !password) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    if (!["Requester", "IT Staff", "Administrator"].includes(role)) {
+      return res.status(400).json({ error: "Invalid role value" });
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already in use" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        role,
+        isActive,
+        passwordHash: hashedPassword,
+        mustChangePassword: true
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        mustChangePassword: true,
+        createdAt: true
+      }
+    });
+
+    res.status(201).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.patch("/api/users/:id", authenticate, requireRole(["Administrator"]), async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    const { name, email, role, isActive } = req.body;
+    const prisma = getPrisma();
+
+    const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+    if (!targetUser) return res.status(404).json({ error: "User not found" });
+
+    if (role && !["Requester", "IT Staff", "Administrator"].includes(role)) {
+      return res.status(400).json({ error: "Invalid role value" });
+    }
+
+    // BR-08: Admin cannot deactivate their own account
+    if (isActive === false && userId === req.user!.id) {
+      return res.status(400).json({ error: "Cannot deactivate your own account" });
+    }
+
+    // Check if changing email to one that already exists
+    if (email && email !== targetUser.email) {
+      const existing = await prisma.user.findUnique({ where: { email } });
+      if (existing) {
+        return res.status(400).json({ error: "Email already in use" });
+      }
+    }
+
+    // BR-08: Prevent removing the last active Administrator
+    if (targetUser.role === "Administrator" && targetUser.isActive) {
+      const isDeactivating = isActive === false;
+      const isChangingRole = role && role !== "Administrator";
+      
+      if (isDeactivating || isChangingRole) {
+        const activeAdminsCount = await prisma.user.count({
+          where: { role: "Administrator", isActive: true }
+        });
+        if (activeAdminsCount <= 1) {
+          return res.status(400).json({ error: "Cannot remove or deactivate the last active Administrator" });
+        }
+      }
+    }
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(name && { name }),
+        ...(email && { email }),
+        ...(role && { role }),
+        ...(isActive !== undefined && { isActive }),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        mustChangePassword: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/users/:id/reset-password", authenticate, requireRole(["Administrator"]), async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    const { newPassword } = req.body;
+    const prisma = getPrisma();
+
+    if (!newPassword) return res.status(400).json({ error: "newPassword is required" });
+
+    const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+    if (!targetUser) return res.status(404).json({ error: "User not found" });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash: hashedPassword,
+        mustChangePassword: true
+      }
+    });
+
+    res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

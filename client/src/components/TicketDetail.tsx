@@ -235,42 +235,42 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
       <div className="card-body bg-light">
         <div className="row g-4">
           <div className="col-lg-8">
-            <div className="bg-white p-4 rounded border mb-4">
-              <h5 className="border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center">
+            <div className="card shadow-sm border-0 p-4 mb-4">
+              <h5 className="border-bottom pb-3 mb-4 d-flex justify-content-between align-items-center">
                 Ticket Information
                 {isStaff && (
                   <div className="d-flex align-items-center gap-2 fs-6 fw-normal">
                     <label className="text-muted small mb-0">Owner:</label>
                     {ticket.ownerId ? (
-                      <span className="badge bg-light text-dark border">{ticket.owner?.name || `User ID ${ticket.ownerId}`}</span>
+                      <span className="badge bg-light text-dark border px-3 py-2">{ticket.owner?.name || `User ID ${ticket.ownerId}`}</span>
                     ) : (
-                      <button className="btn btn-sm btn-outline-success py-0" onClick={handleClaimTicket} disabled={isUpdating}>Claim</button>
+                      <button className="btn btn-sm btn-outline-success py-1 px-3" onClick={handleClaimTicket} disabled={isUpdating}>Claim</button>
                     )}
                   </div>
                 )}
               </h5>
-              <div className="mb-3">
-                <label className="fw-bold text-muted small text-uppercase">Summary</label>
-                <p className="fs-5">{ticket.summary}</p>
+              <div className="mb-4">
+                <label className="fw-bold text-muted small text-uppercase mb-1">Summary</label>
+                <p className="fs-5 fw-medium text-dark">{ticket.summary}</p>
               </div>
-              <div className="mb-3">
-                <label className="fw-bold text-muted small text-uppercase">Description</label>
-                <p className="bg-light p-3 rounded text-break" style={{ whiteSpace: "pre-wrap" }}>{ticket.description}</p>
+              <div className="mb-4">
+                <label className="fw-bold text-muted small text-uppercase mb-2">Description</label>
+                <p className="bg-light p-3 rounded-3 text-break" style={{ whiteSpace: "pre-wrap", border: "1px solid #edf2f7" }}>{ticket.description}</p>
               </div>
               <div className="row">
                 <div className="col-sm-4 mb-3">
-                  <label className="fw-bold text-muted small text-uppercase">Category</label>
-                  <p>{ticket.category?.name}</p>
+                  <label className="fw-bold text-muted small text-uppercase mb-1">Category</label>
+                  <p className="fw-medium">{ticket.category?.name}</p>
                 </div>
                 <div className="col-sm-4 mb-3">
-                  <label className="fw-bold text-muted small text-uppercase">Related System</label>
-                  <p>{ticket.relatedSystem?.name}</p>
+                  <label className="fw-bold text-muted small text-uppercase mb-1">Related System</label>
+                  <p className="fw-medium">{ticket.relatedSystem?.name}</p>
                 </div>
                 <div className="col-sm-4 mb-3">
-                  <label className="fw-bold text-muted small text-uppercase">IT Priority</label>
+                  <label className="fw-bold text-muted small text-uppercase mb-1">IT Priority</label>
                   {isStaff ? (
                     <select 
-                      className="form-select form-select-sm"
+                      className="form-select form-select-sm shadow-none"
                       value={editPriority}
                       onChange={handlePriorityChange}
                       disabled={isUpdating}
@@ -281,31 +281,34 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
                       <option value="Critical">Critical</option>
                     </select>
                   ) : (
-                    <p>{ticket.itPriority || ticket.requestedPriority || "Medium"}</p>
+                    <p className="fw-medium">{ticket.itPriority || ticket.requestedPriority || "Medium"}</p>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Communications Section */}
-            <div className="bg-white p-4 rounded border mb-4">
-              <h5 className="border-bottom pb-2 mb-3">Communications</h5>
+            <div className="card shadow-sm border-0 p-4 mb-4">
+              <h5 className="border-bottom pb-3 mb-4">Communications</h5>
               
               <div className="mb-4" style={{ maxHeight: '400px', overflowY: 'auto' }}>
                 {communications.length === 0 ? (
-                  <p className="text-muted text-center py-4">No comments or notes yet.</p>
+                  <p className="text-muted text-center py-5 bg-light rounded-3">No comments or notes yet.</p>
                 ) : (
                   communications.map((comm) => (
-                    <div key={`${comm.type}-${comm.id}`} className={`p-3 rounded mb-3 border ${comm.type === 'internal_note' ? 'bg-warning bg-opacity-10 border-warning' : 'bg-light'}`}>
-                      <div className="d-flex justify-content-between align-items-center mb-2">
+                    <div key={`${comm.type}-${comm.id}`} className={`comm-bubble ${comm.type === 'internal_note' ? 'comm-internal' : 'comm-public'}`}>
+                      <div className="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom border-opacity-10">
                         <div>
                           <strong className="me-2">{comm.author.name}</strong>
-                          <span className={`badge ${comm.author.role === 'IT Staff' ? 'bg-success bg-opacity-10 text-success' : comm.author.role === 'Administrator' ? 'bg-dark bg-opacity-10 text-dark' : 'bg-primary bg-opacity-10 text-primary'}`}>{comm.author.role}</span>
-                          {comm.type === 'internal_note' && <span className="badge bg-warning text-dark ms-2">Internal Note</span>}
+                          <span className="badge" style={{
+                            backgroundColor: comm.author.role === 'Requester' ? '#E3F2FD' : comm.author.role === 'IT Staff' ? '#0B7A46' : '#37474F',
+                            color: comm.author.role === 'Requester' ? '#000' : '#fff'
+                          }}>{comm.author.role}</span>
+                          {comm.type === 'internal_note' && <span className="badge bg-warning text-dark ms-2"><i className="bi bi-lock-fill me-1"></i>Internal Note</span>}
                         </div>
-                        <small className="text-muted">{new Date(comm.createdAt).toLocaleString()}</small>
+                        <small className="text-muted fw-medium">{new Date(comm.createdAt).toLocaleString()}</small>
                       </div>
-                      <p className="mb-0" style={{ whiteSpace: "pre-wrap" }}>{comm.content}</p>
+                      <p className="mb-0 mt-2" style={{ whiteSpace: "pre-wrap", color: "#2D3748" }}>{comm.content}</p>
                     </div>
                   ))
                 )}
