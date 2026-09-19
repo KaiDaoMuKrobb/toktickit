@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { checkSystem, Category } from "./api.js";
 import { CreateTicket } from "./components/CreateTicket.js";
 import { MyTickets } from "./components/MyTickets.js";
@@ -20,6 +20,13 @@ function AppContent() {
   const [state, setState] = useState<UiState>("idle");
   const [categories, setCategories] = useState<Category[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Route Admin automatically
+  useEffect(() => {
+    if (user && user.role === "Administrator" && currentView === "home") {
+      setCurrentView("admin");
+    }
+  }, [user, currentView]);
 
   if (authLoading) {
     return <div className="d-flex justify-content-center mt-5"><div className="spinner-border text-success" /></div>;
