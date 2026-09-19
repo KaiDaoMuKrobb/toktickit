@@ -40,7 +40,7 @@ describe("Lab 3: Admin User Management APIs", () => {
       }
     });
 
-    const secret = process.env.JWT_SECRET || "fallback_secret";
+    const secret = process.env.JWT_SECRET || "fallback_secret_for_dev";
     adminToken = jwt.sign({ id: admin.id, role: admin.role, mustChangePassword: false }, secret);
     requesterToken = jwt.sign({ id: reqUser.id, role: reqUser.role, mustChangePassword: false }, secret);
   });

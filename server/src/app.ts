@@ -232,6 +232,82 @@ app.get("/api/tickets", authenticate, requireRole(["Requester"]), async (req: Re
 });
 
 // ---------------------------------------------------------------------------
+// Lab 3 — IT Staff Ticket Queue
+// GET /api/tickets/queue
+// ---------------------------------------------------------------------------
+app.get("/api/tickets/queue", authenticate, requireRole(["IT Staff", "Administrator"]), async (req: Request, res: Response) => {
+  try {
+    const { search, category, status, priority, page = "1", limit = "10" } = req.query;
+
+    const pageNum = parseInt(page as string, 10);
+    const limitNum = parseInt(limit as string, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { ticketNumber: { contains: search as string, mode: "insensitive" } },
+        { summary: { contains: search as string, mode: "insensitive" } }
+      ];
+    }
+    if (category) {
+      where.categoryId = parseInt(category as string, 10);
+    }
+    if (status) {
+      where.status = status as string;
+    }
+    if (priority) {
+      where.itPriority = priority as string;
+    }
+
+    const prisma = getPrisma();
+
+    const [tickets, total] = await Promise.all([
+      prisma.ticket.findMany({
+        where,
+        skip,
+        take: limitNum,
+        orderBy: { updatedAt: "desc" },
+        include: {
+          category: { select: { id: true, name: true } },
+          owner: { select: { id: true, name: true } },
+          requester: { select: { id: true, name: true } }
+        }
+      }),
+      prisma.ticket.count({ where })
+    ]);
+
+    const formattedTickets = tickets.map(t => ({
+      id: t.id,
+      ticketNumber: t.ticketNumber,
+      summary: t.summary,
+      category: t.category,
+      requestedPriority: t.requestedPriority,
+      itPriority: t.itPriority,
+      currentStatus: t.status,
+      owner: t.owner,
+      requester: t.requester,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt
+    }));
+
+    res.status(200).json({
+      data: formattedTickets,
+      meta: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ---------------------------------------------------------------------------
 // Lab 2 — Ticket Detail and Attachments (Issue 21)
 // ---------------------------------------------------------------------------
 
@@ -588,9 +664,9 @@ app.post("/api/users", authenticate, requireRole(["Administrator"]), async (req:
         name,
         email,
         role,
-        isActive: isActive !== undefined ? isActive : true,
+        isActive,
         passwordHash: hashedPassword,
-        mustChangePassword: true // usually true for newly created admin accounts
+        mustChangePassword: true
       },
       select: {
         id: true,
@@ -599,8 +675,7 @@ app.post("/api/users", authenticate, requireRole(["Administrator"]), async (req:
         role: true,
         isActive: true,
         mustChangePassword: true,
-        createdAt: true,
-        updatedAt: true
+        createdAt: true
       }
     });
 

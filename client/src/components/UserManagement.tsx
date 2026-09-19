@@ -183,56 +183,59 @@ export function UserManagement() {
       </div>
 
       {loading ? (
-        <p>Loading users...</p>
+        <div className="text-center py-5"><div className="spinner-border text-success" /></div>
       ) : error ? (
         <div className="alert alert-danger">{error}</div>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-hover align-middle">
-            <thead className="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(u => (
-                <tr key={u.id}>
-                  <td>{u.id}</td>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>
-                    {u.role === 'Requester' && <span className="badge text-dark" style={{ backgroundColor: '#E3F2FD' }}>Requester</span>}
-                    {u.role === 'IT Staff' && <span className="badge text-white" style={{ backgroundColor: '#0B7A46' }}>IT Staff</span>}
-                    {u.role === 'Administrator' && <span className="badge text-white" style={{ backgroundColor: '#37474F' }}>Administrator</span>}
-                  </td>
-                  <td>
-                    <div className="form-check form-switch d-inline-block">
-                      <input 
-                        type="checkbox" 
-                        className="form-check-input" 
-                        checked={u.isActive} 
-                        onChange={() => handleToggleActive(u)} 
-                        title={u.isActive ? "Deactivate User" : "Activate User"}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <button className="btn btn-sm btn-outline-secondary" onClick={() => openEditModal(u)}>Edit</button>
-                  </td>
-                </tr>
-              ))}
-              {users.length === 0 && (
+        <div className="card shadow-sm border-0 mb-5">
+          <div className="table-responsive">
+            <table className="table table-hover align-middle mb-0">
+              <thead className="table-light">
                 <tr>
-                  <td colSpan={6} className="text-center py-4 text-muted">No users found.</td>
+                  <th className="ps-4">ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th className="pe-4 text-end">Actions</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u.id}>
+                    <td className="ps-4 text-muted fw-medium">#{u.id}</td>
+                    <td className="fw-bold">{u.name}</td>
+                    <td>{u.email}</td>
+                    <td>
+                      {u.role === 'Requester' && <span className="badge" style={{ backgroundColor: '#E3F2FD', color: '#000' }}>Requester</span>}
+                      {u.role === 'IT Staff' && <span className="badge" style={{ backgroundColor: '#0B7A46', color: '#fff' }}>IT Staff</span>}
+                      {u.role === 'Administrator' && <span className="badge" style={{ backgroundColor: '#37474F', color: '#fff' }}>Administrator</span>}
+                    </td>
+                    <td>
+                      <div className="form-check form-switch d-inline-block">
+                        <input 
+                          type="checkbox" 
+                          className="form-check-input" 
+                          style={{ cursor: "pointer" }}
+                          checked={u.isActive} 
+                          onChange={() => handleToggleActive(u)} 
+                          title={u.isActive ? "Deactivate User" : "Activate User"}
+                        />
+                      </div>
+                    </td>
+                    <td className="pe-4 text-end">
+                      <button className="btn btn-sm btn-outline-secondary px-3" onClick={() => openEditModal(u)}>Edit</button>
+                    </td>
+                  </tr>
+                ))}
+                {users.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="text-center py-5 text-muted">No users found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

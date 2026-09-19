@@ -7,13 +7,14 @@ import { AuthProvider, useAuth } from "./AuthContext.js";
 import { Login } from "./components/Login.js";
 import { ChangePassword } from "./components/ChangePassword.js";
 import { UserManagement } from "./components/UserManagement.js";
+import { StaffTicketQueue } from "./components/StaffTicketQueue.js";
 
 // UI states you must handle for Issue 4: idle, loading, success, error.
 type UiState = "idle" | "loading" | "success" | "error";
 
 function AppContent() {
   const { user, loading: authLoading, logout } = useAuth();
-  const [currentView, setCurrentView] = useState<"home" | "create" | "detail" | "admin">("home");
+  const [currentView, setCurrentView] = useState<"home" | "create" | "detail" | "admin" | "queue">("home");
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [createdTicketNumber, setCreatedTicketNumber] = useState<string | null>(null);
 
@@ -21,10 +22,13 @@ function AppContent() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Route Admin automatically
   useEffect(() => {
-    if (user && user.role === "Administrator" && currentView === "home") {
-      setCurrentView("admin");
+    if (user && currentView === "home") {
+      if (user.role === "Administrator") {
+        setCurrentView("admin");
+      } else if (user.role === "IT Staff") {
+        setCurrentView("queue");
+      }
     }
   }, [user, currentView]);
 
@@ -65,9 +69,9 @@ function AppContent() {
 
   return (
     <div className="container py-5" style={{ maxWidth: 1000 }}>
-      <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-        <h1 className="h3 mb-0" style={{ cursor: 'pointer' }} onClick={() => setCurrentView("home")}>
-          TokTickIT <span className="text-success">IT Service Desk</span>
+      <div className="app-header d-flex justify-content-between align-items-center mb-4 pb-3 rounded-bottom-4 px-3 shadow-sm" style={{ margin: "-3rem -1rem 2rem -1rem" }}>
+        <h1 className="h3 mb-0 fw-bold" style={{ cursor: 'pointer', letterSpacing: '-0.5px' }} onClick={() => setCurrentView("home")}>
+          TokTickIT <span style={{ color: "var(--zen-green)" }}>IT Service Desk</span>
         </h1>
         <div className="d-flex gap-3 align-items-center">
           {user.role === "Administrator" && (
@@ -78,7 +82,15 @@ function AppContent() {
               Admin
             </button>
           )}
-          {currentView === "home" && (
+          {user.role === "IT Staff" && (
+            <button 
+              className={`btn ${currentView === "queue" ? "btn-success" : "btn-outline-success"}`} 
+              onClick={() => setCurrentView("queue")}
+            >
+              My Queue
+            </button>
+          )}
+          {user.role === "Requester" && currentView === "home" && (
             <button 
               className="btn btn-success" 
               onClick={() => setCurrentView("create")}
@@ -130,13 +142,24 @@ function AppContent() {
             </div>
           )}
           
-          <MyTickets 
-            requesterId={user.id} 
-            onTicketClick={(ticketId) => {
-              setSelectedTicketId(ticketId);
-              setCurrentView("detail");
-            }}
-          />
+          {currentView === "home" && user.role === "Requester" && (
+            <MyTickets 
+              requesterId={user.id} 
+              onTicketClick={(id) => {
+                setSelectedTicketId(id);
+                setCurrentView("detail");
+              }} 
+            />
+          )}
+
+          {currentView === "queue" && user.role === "IT Staff" && (
+            <StaffTicketQueue 
+              onTicketClick={(id) => {
+                setSelectedTicketId(id);
+                setCurrentView("detail");
+              }} 
+            />
+          )}
 
           {/* Legacy Health Check (Lab 1) - required to pass tests */}
           <div className="mt-5 pt-3 border-top border-2 border-dashed opacity-50">
