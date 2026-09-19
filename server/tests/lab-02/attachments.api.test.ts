@@ -8,6 +8,8 @@ import fs from "fs";
 describe("Attachments API", () => {
   let requester1: number;
   let requester2: number;
+  let cookie1: string;
+  let cookie2: string;
   let ticket1Id: number;
   let uploadDir: string;
 
@@ -15,9 +17,15 @@ describe("Attachments API", () => {
     const prisma = getPrisma();
     
     // Setup data
-    const requesters = await prisma.requesterUser.findMany({ where: { isActive: true }, take: 2 });
+    const requesters = await prisma.user.findMany({ where: { isActive: true, role: "Requester" }, take: 2 });
     requester1 = requesters[0].id;
     requester2 = requesters[1].id;
+
+    const res1 = await request(app).post("/api/auth/login").send({ email: requesters[0].email, password: "password123" });
+    cookie1 = res1.headers["set-cookie"][0].split(";")[0];
+
+    const res2 = await request(app).post("/api/auth/login").send({ email: requesters[1].email, password: "password123" });
+    cookie2 = res2.headers["set-cookie"][0].split(";")[0];
 
     const category = await prisma.category.findFirst();
     const system = await prisma.relatedSystem.findFirst();
@@ -55,7 +63,7 @@ describe("Attachments API", () => {
 
     const res = await request(app)
       .post(`/api/tickets/${ticket1Id}/attachments`)
-      .set("X-Development-Requester-Id", String(requester1))
+      .set("Cookie", cookie1)
       .attach("file", filePath);
 
     fs.unlinkSync(filePath);
@@ -72,7 +80,7 @@ describe("Attachments API", () => {
 
     const res = await request(app)
       .post(`/api/tickets/${ticket1Id}/attachments`)
-      .set("X-Development-Requester-Id", String(requester2))
+      .set("Cookie", cookie2)
       .attach("file", filePath);
 
     fs.unlinkSync(filePath);
@@ -86,7 +94,7 @@ describe("Attachments API", () => {
 
     const res = await request(app)
       .post(`/api/tickets/${ticket1Id}/attachments`)
-      .set("X-Development-Requester-Id", String(requester1))
+      .set("Cookie", cookie1)
       .attach("file", filePath);
 
     fs.unlinkSync(filePath);
@@ -102,7 +110,7 @@ describe("Attachments API", () => {
 
     const uploadRes = await request(app)
       .post(`/api/tickets/${ticket1Id}/attachments`)
-      .set("X-Development-Requester-Id", String(requester1))
+      .set("Cookie", cookie1)
       .attach("file", filePath);
 
     fs.unlinkSync(filePath);
@@ -111,14 +119,14 @@ describe("Attachments API", () => {
     // 2. Soft-remove it
     const deleteRes = await request(app)
       .delete(`/api/tickets/${ticket1Id}/attachments/${attachmentId}`)
-      .set("X-Development-Requester-Id", String(requester1));
+      .set("Cookie", cookie1);
 
     expect(deleteRes.status).toBe(200);
 
     // 3. Try to download it (should be 410 Gone)
     const downloadRes = await request(app)
       .get(`/api/attachments/${attachmentId}/download`)
-      .set("X-Development-Requester-Id", String(requester1));
+      .set("Cookie", cookie1);
 
     expect(downloadRes.status).toBe(410);
   });

@@ -34,13 +34,21 @@ model RelatedSystem {
   tickets   Ticket[]
 }
 
-model RequesterUser {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  tickets   Ticket[]
+model User {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  email              String   @unique
+  role               String   @default("Requester")
+  passwordHash       String   @default("")
+  mustChangePassword Boolean  @default(true)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  tickets            Ticket[]
+  ownedTickets       Ticket[]        @relation("TicketOwner")
+  publicComments     PublicComment[]
+  internalNotes      InternalNote[]
+
+  @@map("RequesterUser")
 }
 
 model Ticket {
@@ -59,9 +67,37 @@ model Ticket {
   relatedSystem   RelatedSystem @relation(fields: [relatedSystemId], references: [id])
   
   requesterId   Int
-  requester     RequesterUser @relation(fields: [requesterId], references: [id])
+  requester     User @relation(fields: [requesterId], references: [id])
+  
+  ownerId           Int?
+  owner             User?  @relation("TicketOwner", fields: [ownerId], references: [id])
+  requestedPriority String @default("Medium")
+  itPriority        String @default("Medium")
+  requesterResolved Boolean @default(false)
   
   attachments   Attachment[]
+  publicComments PublicComment[]
+  internalNotes  InternalNote[]
+}
+
+model PublicComment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+}
+
+model InternalNote {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
 }
 
 model Attachment {
