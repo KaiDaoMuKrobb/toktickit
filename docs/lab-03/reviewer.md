@@ -5,6 +5,8 @@
 **Date:** September 19, 2026
 
 ## 1. Summary of Review
+**PR Link:** [https://github.com/KaiDaoMuKrobb/toktickit/pull/43](https://github.com/KaiDaoMuKrobb/toktickit/pull/43)
+
 The implementation of the Authentication, Role-based Access Control (RBAC), and Administrator User Management features meets all the requirements outlined in the Lab 3 Specification. The codebase is well-structured, follows security best practices (JWT with HTTP-Only cookies), and enforces the "Zen Green" design language consistently.
 
 ## 2. Strengths
