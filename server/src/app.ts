@@ -551,8 +551,7 @@ app.get("/api/users", authenticate, requireRole(["Administrator"]), async (req: 
         role: true,
         isActive: true,
         mustChangePassword: true,
-        createdAt: true,
-        updatedAt: true
+        createdAt: true
       },
       orderBy: { id: "asc" }
     });
