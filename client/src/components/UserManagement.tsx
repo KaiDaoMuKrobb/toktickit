@@ -159,7 +159,7 @@ export function UserManagement() {
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Administrator User Management</h2>
-        <button className="btn btn-primary" onClick={openCreateModal}>+ Create New User</button>
+        <button className="btn btn-success" onClick={openCreateModal}>+ Create New User</button>
       </div>
 
       <div className="row mb-3">
@@ -285,7 +285,7 @@ export function UserManagement() {
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                <button type="submit" className="btn btn-success" disabled={isSubmitting}>
                   {isSubmitting ? "Creating..." : "Create User"}
                 </button>
               </div>
@@ -339,7 +339,7 @@ export function UserManagement() {
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                <button type="submit" className="btn btn-success" disabled={isSubmitting}>
                   {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>
