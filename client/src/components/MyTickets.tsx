@@ -38,7 +38,7 @@ export function MyTickets({ requesterId, onTicketClick }: Props) {
 
   // Fetch reference categories
   useEffect(() => {
-    fetch("http://localhost:3000/api/categories")
+    fetch("/api/categories")
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(console.error);
@@ -54,8 +54,8 @@ export function MyTickets({ requesterId, onTicketClick }: Props) {
     if (categoryFilter) params.append("category", categoryFilter);
     if (statusFilter) params.append("status", statusFilter);
 
-    fetch(`http://localhost:3000/api/tickets?${params.toString()}`, {
-      headers: { "X-Development-Requester-Id": String(requesterId) }
+    fetch(`/api/tickets?${params.toString()}`, {
+      method: "GET"
     })
       .then(res => {
         if (!res.ok) throw new Error("Failed to fetch tickets");

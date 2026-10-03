@@ -2,9 +2,24 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MyTickets } from "../../src/components/MyTickets.js";
 import App from "../../src/App.js";
+import * as AuthContext from "../../src/AuthContext.js";
+
+// Mock the AuthContext so that the app renders as an unauthenticated user by default
+vi.mock("../../src/AuthContext.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../src/AuthContext.js")>();
+  return {
+    ...actual,
+    useAuth: vi.fn(() => ({
+      user: null,
+      loading: false,
+      logout: vi.fn(),
+      fetchUser: vi.fn(),
+    })),
+  };
+});
 
 // Mock the global fetch
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 describe("MyTickets Component", () => {
   beforeEach(() => {
@@ -13,7 +28,7 @@ describe("MyTickets Component", () => {
 
   it("should show 'No matching tickets found' when search yields empty results (UI-03, AC-10)", async () => {
     // Mock the initial fetch and search fetch to return 0 tickets
-    (global.fetch as any).mockImplementation((url: string) => {
+    (globalThis.fetch as any).mockImplementation((url: string) => {
       if (url.includes("/api/categories")) {
         return Promise.resolve({
           ok: true,
@@ -48,7 +63,7 @@ describe("MyTickets Component", () => {
     // Enter search term and submit
     const searchInput = screen.getByPlaceholderText(/Search by summary/i);
     fireEvent.change(searchInput, { target: { value: "nonexistent" } });
-    
+
     const searchBtn = screen.getByRole("button", { name: /Search/i });
     fireEvent.click(searchBtn);
 
@@ -59,16 +74,11 @@ describe("MyTickets Component", () => {
   });
 
   it("should enforce Requester Selection on unauthenticated access (UI-01, AC-02)", async () => {
-    (global.fetch as any).mockImplementation(() => Promise.resolve({
-      ok: true,
-      json: async () => ([])
-    }));
-    
     // Render the main App which manages auth state
     render(<App />);
 
-    // Since requesterId is null initially, it should show the Requester Selection screen
-    expect(await screen.findByText(/Select Development Requester/i)).toBeInTheDocument();
+    // Since requesterId is null initially, it should show the Login screen
+    expect(await screen.findByText(/Sign in to the IT Service Desk/i)).toBeInTheDocument();
     expect(screen.queryByText(/My Tickets/i)).not.toBeInTheDocument();
   });
 });

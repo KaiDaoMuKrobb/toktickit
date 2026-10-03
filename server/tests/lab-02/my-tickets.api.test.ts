@@ -6,6 +6,8 @@ import { getPrisma } from "../../src/prisma.js";
 describe("GET /api/tickets", () => {
   let requester1: number;
   let requester2: number;
+  let cookie1: string;
+  let cookie2: string;
   let categoryId: number;
   let systemId: number;
 
@@ -13,9 +15,15 @@ describe("GET /api/tickets", () => {
     const prisma = getPrisma();
     
     // Setup data
-    const requesters = await prisma.requesterUser.findMany({ where: { isActive: true }, take: 2 });
+    const requesters = await prisma.user.findMany({ where: { isActive: true, role: "Requester" }, take: 2 });
     requester1 = requesters[0].id;
     requester2 = requesters[1].id;
+
+    const res1 = await request(app).post("/api/auth/login").send({ email: requesters[0].email, password: "password123" });
+    cookie1 = res1.headers["set-cookie"][0].split(";")[0];
+
+    const res2 = await request(app).post("/api/auth/login").send({ email: requesters[1].email, password: "password123" });
+    cookie2 = res2.headers["set-cookie"][0].split(";")[0];
 
     const category = await prisma.category.findFirst();
     categoryId = category!.id;
@@ -50,7 +58,7 @@ describe("GET /api/tickets", () => {
   it("should return tickets belonging to the requester with pagination", async () => {
     const res = await request(app)
       .get("/api/tickets?limit=2")
-      .set("X-Development-Requester-Id", String(requester1));
+      .set("Cookie", cookie1);
 
     expect(res.status).toBe(200);
     expect(res.body.data).toHaveLength(2);
@@ -62,7 +70,7 @@ describe("GET /api/tickets", () => {
   it("should enforce ownership protection (requester2 sees only 1 ticket)", async () => {
     const res = await request(app)
       .get("/api/tickets")
-      .set("X-Development-Requester-Id", String(requester2));
+      .set("Cookie", cookie2);
 
     expect(res.status).toBe(200);
     expect(res.body.data).toHaveLength(1);
@@ -72,7 +80,7 @@ describe("GET /api/tickets", () => {
   it("should filter by search summary", async () => {
     const res = await request(app)
       .get("/api/tickets?search=network")
-      .set("X-Development-Requester-Id", String(requester1));
+      .set("Cookie", cookie1);
 
     expect(res.status).toBe(200);
     expect(res.body.data).toHaveLength(1);

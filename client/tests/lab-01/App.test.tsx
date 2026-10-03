@@ -3,14 +3,24 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import App from "../../src/App.js";
 import * as api from "../../src/api.js";
 
-vi.mock("../../src/components/DevelopmentRequesterSelector.js", () => ({
-  DevelopmentRequesterSelector: ({ onSelect }: any) => (
-    <button onClick={() => onSelect(1)}>Mock Select Requester</button>
-  ),
-}));
+import * as AuthContext from "../../src/AuthContext.js";
+
+// Mock the AuthContext so that the app renders as an authenticated user
+vi.mock("../../src/AuthContext.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../src/AuthContext.js")>();
+  return {
+    ...actual,
+    useAuth: vi.fn(() => ({
+      user: { id: 1, name: "Jennifer Anderson", role: "Requester" },
+      loading: false,
+      logout: vi.fn(),
+      fetchUser: vi.fn(),
+    })),
+  };
+});
 
 // Mock global fetch to prevent components rendered by App (like MyTickets) from making actual network requests
-global.fetch = vi.fn((url: string) => {
+globalThis.fetch = vi.fn((url: string) => {
   if (url.includes("/api/categories") || url.includes("/api/requesters")) {
     return Promise.resolve({
       ok: true,
@@ -27,7 +37,6 @@ describe("App", () => {
   // WORKED EXAMPLE — provided for you.
   it("renders the TokTickIT heading", async () => {
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Mock Select Requester" }));
     expect(screen.getByText(/TokTickIT/i)).toBeInTheDocument();
     
     // Wait for MyTickets initial fetch to settle to avoid act() warning
@@ -49,7 +58,6 @@ describe("App", () => {
     });
     
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Mock Select Requester" }));
     fireEvent.click(screen.getByRole("button", { name: /check system/i }));
     
     await waitFor(() => {
@@ -68,7 +76,6 @@ describe("App", () => {
     vi.spyOn(api, "checkSystem").mockRejectedValue(new Error("Unable to connect to TokTickIT API"));
     
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Mock Select Requester" }));
     fireEvent.click(screen.getByRole("button", { name: /check system/i }));
     
     await waitFor(() => {

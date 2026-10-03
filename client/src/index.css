@@ -1,0 +1,162 @@
+/* TokTickIT Premium Zen Green UI */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --zen-green: #006B3C;
+  --zen-green-light: #EAF6EF;
+  --zen-green-dark: #0B7A46;
+  --bg-color: #F8F9FA;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: #2D3748;
+}
+
+/* Card Styling */
+.card {
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-success {
+  background-color: var(--zen-green);
+  border-color: var(--zen-green);
+}
+
+.btn-success:hover {
+  background-color: var(--zen-green-dark);
+  border-color: var(--zen-green-dark);
+}
+
+.btn-outline-success {
+  color: var(--zen-green);
+  border-color: var(--zen-green);
+  background-color: transparent;
+}
+
+.btn-outline-success:hover {
+  background-color: var(--zen-green);
+  color: white;
+}
+
+/* Badges */
+.badge {
+  padding: 0.5em 0.8em;
+  font-weight: 600;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+/* Table Enhancements */
+.table {
+  vertical-align: middle;
+}
+
+.table th {
+  font-weight: 600;
+  color: #4A5568;
+  border-bottom: 2px solid #edf2f7;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.table td {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid #edf2f7;
+  color: #2D3748;
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--zen-green-light);
+}
+
+/* Input Fields */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  padding: 0.6rem 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--zen-green);
+  box-shadow: 0 0 0 3px rgba(0, 107, 60, 0.15);
+}
+
+/* Navigation Header */
+.app-header {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Custom Modal */
+.modal-content {
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  border-bottom: 1px solid #edf2f7;
+  padding: 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  border-top: 1px solid #edf2f7;
+  padding: 1.25rem 1.5rem;
+}
+
+/* Internal Notes & Comments */
+.comm-bubble {
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+}
+
+.comm-public {
+  background-color: var(--zen-green-light);
+  border-color: rgba(0, 107, 60, 0.1);
+}
+
+.comm-internal {
+  background-color: #FFF8E1;
+  border-color: rgba(255, 193, 7, 0.2);
+}

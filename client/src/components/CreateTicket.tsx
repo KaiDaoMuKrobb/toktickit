@@ -29,14 +29,14 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
   const isFormValid = isSummaryValid && isDescValid && categoryId && relatedSystemId;
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/categories")
+    fetch("/api/categories")
       .then(res => res.json())
       .then(data => {
         setCategories(data);
       })
       .catch(() => {});
       
-    fetch("http://localhost:3000/api/systems")
+    fetch("/api/systems")
       .then(res => res.json())
       .then(data => {
         setSystems(data);
@@ -45,7 +45,7 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
       .catch(() => setLoadingCats(false));
       
     // Fetch requester name for display
-    fetch("http://localhost:3000/api/requesters")
+    fetch("/api/requesters")
       .then(res => res.json())
       .then(data => {
         const req = data.find((r: any) => r.id === requesterId);
@@ -64,11 +64,10 @@ export function CreateTicket({ requesterId, onSuccess, onCancel }: Props) {
     setError("");
     
     try {
-      const res = await fetch("http://localhost:3000/api/tickets", {
+      const res = await fetch("/api/tickets", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "X-Development-Requester-Id": String(requesterId)
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           summary,
