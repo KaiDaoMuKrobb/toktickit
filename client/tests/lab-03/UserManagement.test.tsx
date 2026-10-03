@@ -95,8 +95,14 @@ describe("UserManagement Component", () => {
     });
   });
 
-  it("Should deny access to non-Administrators", () => {
+  it("Should deny access to non-Administrators", async () => {
+    (global.fetch as any).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ error: "Forbidden" })
+    });
     renderWithAuth({ id: 2, role: "IT Staff" });
-    expect(screen.getByText(/Access Denied: Administrators only/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Access Denied: Administrators only/i)).toBeInTheDocument();
+    });
   });
 });
