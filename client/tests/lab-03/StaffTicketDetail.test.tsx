@@ -30,6 +30,7 @@ describe("StaffTicketDetail Component", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.spyOn(window, 'alert').mockImplementation(() => {});
   });
 
   it("should show claim button and allow IT Staff to claim ticket", async () => {

@@ -67,7 +67,68 @@ async function main() {
     });
   }
 
-  console.log("Categories, Systems, and Users seeded successfully!");
+  // Fetch IDs for references
+  const hardwareCat = await prisma.category.findUnique({ where: { name: "Hardware" } });
+  const accessCat = await prisma.category.findUnique({ where: { name: "Account and Access" } });
+  const emailSys = await prisma.relatedSystem.findUnique({ where: { name: "Email" } });
+  const vpnSys = await prisma.relatedSystem.findUnique({ where: { name: "VPN" } });
+
+  const reqUser = await prisma.user.findUnique({ where: { email: "jennifer@example.com" } });
+  const itUser = await prisma.user.findUnique({ where: { email: "it1@example.com" } });
+
+  if (hardwareCat && accessCat && emailSys && vpnSys && reqUser && itUser) {
+    const tickets = [
+      {
+        ticketNumber: "TKT-2026-0001",
+        summary: "Laptop battery drains quickly",
+        description: "My laptop battery is draining much faster than usual even when the system is idle. This started happening after last week's Windows update.",
+        status: "In Progress",
+        categoryId: hardwareCat.id,
+        relatedSystemId: emailSys.id,
+        requesterId: reqUser.id,
+        ownerId: itUser.id,
+        requestedPriority: "Medium",
+        itPriority: "Medium",
+        requesterResolved: false
+      },
+      {
+        ticketNumber: "TKT-2026-0002",
+        summary: "Cannot connect to VPN",
+        description: "I am unable to connect to the VPN using my current credentials. It says 'authentication failed'.",
+        status: "New",
+        categoryId: accessCat.id,
+        relatedSystemId: vpnSys.id,
+        requesterId: reqUser.id,
+        ownerId: null, // Unassigned
+        requestedPriority: "High",
+        itPriority: "High",
+        requesterResolved: false
+      },
+      {
+        ticketNumber: "TKT-2026-0003",
+        summary: "Need access to SharePoint",
+        description: "Please grant me access to the Engineering SharePoint site for the new project.",
+        status: "Resolved",
+        categoryId: accessCat.id,
+        relatedSystemId: emailSys.id,
+        requesterId: reqUser.id,
+        ownerId: itUser.id,
+        requestedPriority: "Low",
+        itPriority: "Low",
+        requesterResolved: true
+      }
+    ];
+
+    for (const ticket of tickets) {
+      await prisma.ticket.upsert({
+        where: { ticketNumber: ticket.ticketNumber },
+        update: ticket,
+        create: ticket
+      });
+    }
+  }
+
+  console.log("Categories, Systems, Users, and Tickets seeded successfully!");
 }
 
 main()

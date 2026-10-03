@@ -139,7 +139,7 @@ The backend currently exposes the following RESTful endpoints:
   ]
   ```
 
-> **Note:** For the complete and detailed REST API documentation covering Tickets, Attachments, Requesters, and Related Systems introduced in Lab 2, please refer to our [API Specification Document](docs/lab-02/api-spec.md).
+> **Note:** For the complete and detailed REST API documentation covering Authentication, Users, Tickets, Attachments, and Communications introduced in Lab 3, please refer to our [API Specification Document](docs/lab-03/api-spec.md).
 
 ---
 
@@ -190,7 +190,10 @@ toktickit/
 ├── e2e/                    # End-to-End UI tests (Playwright)
 ├── docs/                   # Laboratory documentation and PDF exports
 │   ├── lab-01/             # Lab 1 documents and evidence
-│   └── lab-02/             # Lab 2 specification, AI use, and peer review logs
+│   ├── lab-02/             # Lab 2 specification, AI use, and peer review logs
+│   └── lab-03/             # Lab 3 specification, tests, and peer review logs
+├── artifacts/              # Generated artifacts and screenshots
+│   └── lab-03/             # Screenshots for Lab 3 submission
 ├── .gitignore              # Ignored files (node_modules, .env, dist, etc.)
 └── README.md               # You are here!
 ```
