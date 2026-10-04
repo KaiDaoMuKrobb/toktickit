@@ -32,9 +32,27 @@
 
 ## Pull Requests I Reviewed (My Partner's PRs)
 
-*(⚠️ ให้คุณไปดูใน GitHub ของ Mixkyy แล้วเอาลิงก์ PR ที่คุณไปคอมเมนต์ให้เพื่อน มาใส่ตรงนี้แบบเดียวกันกับตอน Lab 2 ได้เลยครับ)*
+### PR #40: docs: add lab 3 engineering contract and specifications
+- **Link:** https://github.com/Mixkyy/toktickit/pull/40
+- **My Comment:** "Looks good, Approve!"
+- **Partner's Response:** "Thank you kub <333"
 
-### PR #XX: [Title of your partner's PR]
-- **Link:** https://github.com/Mixkyy/toktickit/pull/XX
-- **My Comment:** "..."
-- **Partner's Response:** "..."
+### PR #41: feat: implement database migration and secure auth API
+- **Link:** https://github.com/Mixkyy/toktickit/pull/41
+- **My Comment:** "Looks great! The auth implementation and data migration work perfectly. Approved! 🚀"
+- **Partner's Response:** "Thank you kubbbb <333"
+
+### PR #42: feat: IT Staff Ticket Queue
+- **Link:** https://github.com/Mixkyy/toktickit/pull/42
+- **My Comment:** "Looks good! The queue UI and API work well. Approved!"
+- **Partner's Response:** "Thank you kubbb <333"
+
+### PR #44: feat: implement IT Staff operations, comments, and internal notes
+- **Link:** https://github.com/Mixkyy/toktickit/pull/44
+- **My Comment:** "Great work on the IT Staff Ticket Operations. The endpoints align perfectly with your api-spec.md contract, and the role-based UI looks solid. Approved!"
+- **Partner's Response:** "Thank you kubbb <333"
+
+### PR #45: feat: complete Auth UI and Administrator User Management
+- **Link:** https://github.com/Mixkyy/toktickit/pull/45
+- **My Comment:** "Great work on this. The JWT auth implementation is solid and the Admin UI matches the mockups perfectly. Approved!"
+- **Partner's Response:** "Thank you for the approval kubb <3"
