@@ -1,22 +1,40 @@
-# Peer Review Report
+# Peer Review Documentation
 
-**Reviewer Name:** Sunny
-**Reviewed Project:** TokTickIT (Lab 3: Authentication & User Management)
-**Date:** September 19, 2026
+**My GitHub Username:** KaiDaoMuKrobb
+**My Reviewer's GitHub Username:** Mixkyy
 
-## 1. Summary of Review
-**PR Link:** [https://github.com/KaiDaoMuKrobb/toktickit/pull/43](https://github.com/KaiDaoMuKrobb/toktickit/pull/43)
+## Pull Requests I Authored & Received Review On
 
-The implementation of the Authentication, Role-based Access Control (RBAC), and Administrator User Management features meets all the requirements outlined in the Lab 3 Specification. The codebase is well-structured, follows security best practices (JWT with HTTP-Only cookies), and enforces the "Zen Green" design language consistently.
+### PR #37: docs: add lab 3 engineering contracts
+- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/37
+- **Reviewer Comment:** "The specification documents look great! All Lab 3 requirements (Auth, IT Queue, Admin) are well-defined, and the test plan maps perfectly to the Acceptance Criteria. Approved kubb <3"
+- **My Response:** Thankyou<3
 
-## 2. Strengths
-- **Security:** Passwords are appropriately hashed using `bcrypt` and JWTs are stored in HTTP-Only cookies, preventing XSS vulnerabilities. First-login users are forced to change their passwords in a secure intercept flow.
-- **UI Compliance:** The Administrator User Management interface perfectly matches the minimalist requirement in `ui-spec.md`. The removal of extraneous buttons (combining Reset Password into the Edit Modal) demonstrates a strong understanding of UI consistency. Role badges and backgrounds use the exact hex codes requested.
-- **Testing:** The test suite covers all acceptance criteria and edge cases, achieving 100% pass rates across Unit, API, and UI component tests.
+### PR #38: feat: backend authentication foundation
+- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/38
+- **Reviewer Comment:** "Fantastic work! The migration to the new User model looks solid, and using bcrypt with HTTP-Only JWTs is exactly the secure authentication foundation we need. Approved kubbb <333"
+- **My Response:** Thankyou<3
 
-## 3. Areas for Improvement (Minor)
-- **Error Feedback:** Although standard API errors are mapped well on the UI, displaying field-specific validation text below individual inputs (rather than relying strictly on HTML5 attributes) would further enhance UX in forms.
-- **Queue Views:** The role-based landing views are correctly implemented, but ensuring that future IT Staff queue implementations are clearly abstracted into a separate component will keep `App.tsx` clean.
+### PR #39: feat: frontend authentication UI
+- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/39
+- **Reviewer Comment:** "Excellent work integrating the frontend with our new authentication system. The `AuthContext` implementation looks robust, and successfully intercepting the forced password change is exactly what the specs required. The UI updates to replace the development mock are clean. Overall looks great. Approved kubb <333"
+- **My Response:** Thankyou<3
 
-## 4. Final Verdict
-**Approved.** The pull request perfectly handles the Lab 3 scope and is safe to be merged into `main`.
+### PR #41: feat: implement IT Staff Ticket Operations #35
+- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/41
+- **Reviewer Comment:** "Great work on the IT Staff Operations! The API routes and the Role-based UI look really solid, and the frontend matches the Zen Green design perfectly. Everything looks good on my end. Approved and ready to merge kubb <3"
+- **My Response:** Thankyou <3
+
+### PR #43: Lab 3: Authentication and Admin User Management
+- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/43
+- **Reviewer Comment:** "Awesome work! I reviewed the changes and everything looks great. The implementation of the JWT authentication, role-based workflows, and the admin dashboard are spot on, and the Zen Green aesthetic upgrades look fantastic. All the E2E tests are passing perfectly on my end too. Approved and ready to merge <333"
+- **My Response:** Thankyou<3
+
+## Pull Requests I Reviewed (My Partner's PRs)
+
+*(⚠️ ให้คุณไปดูใน GitHub ของ Mixkyy แล้วเอาลิงก์ PR ที่คุณไปคอมเมนต์ให้เพื่อน มาใส่ตรงนี้แบบเดียวกันกับตอน Lab 2 ได้เลยครับ)*
+
+### PR #XX: [Title of your partner's PR]
+- **Link:** https://github.com/Mixkyy/toktickit/pull/XX
+- **My Comment:** "..."
+- **Partner's Response:** "..."
