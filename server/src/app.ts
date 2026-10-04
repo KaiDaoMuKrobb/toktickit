@@ -742,8 +742,7 @@ app.patch("/api/users/:id", authenticate, requireRole(["Administrator"]), async 
         role: true,
         isActive: true,
         mustChangePassword: true,
-        createdAt: true,
-        updatedAt: true
+        createdAt: true
       }
     });
 
