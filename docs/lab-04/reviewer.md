@@ -7,9 +7,9 @@
 
 ## Pull Requests I Authored & Received Review On
 
-### PR #48: docs: add Lab 4 engineering contract and specifications
+### PR #56: docs: add Lab 4 engineering contract and specifications
 - **Branch:** `feature/lab4-spec` -> `lab4-staging`
-- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/48
+- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/56
 - **Reviewer Comment:** "The specification documents for Lab 4 are very thorough and complete! The Business Rules for Actions Taken (BR-01, BR-02), the full status transition matrix, and the optimistic concurrency handling (409 Conflict) are well-defined. Acceptance criteria map cleanly to tests.md. Approved kubb <3"
 - **My Response:** "Thank you! Proceeding to the database migration and foundation implementation. <3"
 
