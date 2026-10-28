@@ -171,3 +171,4 @@ Full schemas and payload specifications are documented in `docs/lab-04/api-spec.
 - **Assumption:** Browser sessions maintain HTTP-Only JWT authentication cookies established in Lab 3.
 - **Decision:** The Requester's "Problem Appears Resolved" flag remains an advisory hint and does NOT automatically set `status = Resolved`. Formal resolution is an explicit transition performed by IT Staff to safeguard service quality.
 - **Decision:** Stale updates are handled via HTTP 409 Conflict returning current server state, prompting the user interface to refresh and alert the user without destructive data loss.
+

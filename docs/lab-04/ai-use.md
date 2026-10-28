@@ -26,3 +26,4 @@ Using the AI as a specification agent helped formalize requirements before writi
 
 ### Coding Agent
 In the coding phase, the AI served as a rapid pair programmer. It was especially effective at generating Prisma schema migrations without breaking legacy data, scaffolding type-safe Express endpoints with robust error handling, and implementing accessible React components following the Zen Green theme. Pairing with the AI on writing automated tests (Unit, API, Component, and E2E) ensured comprehensive test coverage and verified that zero regressions occurred in earlier features from Labs 1 to 3. Overall, applying Spec-Driven Development (Spec DD) and Test-Driven Development (Test DD) with AI guidance led to a well-structured, production-grade service desk application.
+

@@ -47,3 +47,4 @@ npm test
 cd e2e
 npx playwright test
 ```
+

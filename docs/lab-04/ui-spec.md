@@ -158,3 +158,4 @@ Appears directly on the Ticket Detail page below the Ticket Overview card.
 - [x] Non-color status indicators: Icons and textual labels complement all color badges.
 - [x] Empty states have informative illustrations/icons and friendly guidance text.
 - [x] Loading spinners and skeleton screens announce state to screen readers via `aria-live="polite"`.
+
