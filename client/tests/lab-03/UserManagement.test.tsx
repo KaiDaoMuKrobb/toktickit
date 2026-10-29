@@ -5,7 +5,7 @@ import * as AuthContextModule from "../../src/AuthContext";
 import React from "react";
 
 // Mock fetch
-global.fetch = vi.fn();
+(globalThis as any).fetch = vi.fn();
 
 // Mock useAuth
 vi.mock("../../src/AuthContext", async () => {
@@ -37,16 +37,15 @@ describe("UserManagement Component", () => {
   const renderWithAuth = (user: any) => {
     vi.mocked(AuthContextModule.useAuth).mockReturnValue({
       user,
-      login: vi.fn(),
       logout: vi.fn(),
       fetchUser: vi.fn(),
       loading: false
-    });
+    } as any);
     return render(<UserManagement />);
   };
 
   it("UI-03: Admin creates new user - Form submits, modal closes, user list updates", async () => {
-    (global.fetch as any)
+    ((globalThis as any).fetch as any)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => mockUsers
@@ -83,7 +82,7 @@ describe("UserManagement Component", () => {
 
     // Wait for the third fetch (the update)
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(3);
+      expect((globalThis as any).fetch).toHaveBeenCalledTimes(3);
     });
 
     // Verify modal is closed
@@ -96,7 +95,7 @@ describe("UserManagement Component", () => {
   });
 
   it("Should deny access to non-Administrators", async () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    ((globalThis as any).fetch as any).mockResolvedValueOnce({
       ok: false,
       json: async () => ({ error: "Forbidden" })
     });
