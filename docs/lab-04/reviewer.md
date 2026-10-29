@@ -37,11 +37,11 @@
 - **Reviewer Comment:** "Dashboards return authoritative metrics with fast aggregations. The Requester dashboard strictly enforces user boundaries, and the Staff dashboard drill-downs are clean. Approved kubb!"
 - **My Response:** "Thanks! Starting the UI components and Zen Green styling."
 
-### PR #52: feat: Zen Green UI for Dashboards, Actions Taken, and Final Hardening
-- **Branch:** `feature/lab4-ui-hardening` -> `lab4-staging`
-- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/52
-- **Reviewer Comment:** "Awesome work on the Zen Green UI! The Actions Taken table and responsive modal work smoothly across mobile and desktop. Keyboard focus and non-color cues meet accessibility standards, and all regression tests pass. Ready to merge to main! <333"
-- **My Response:** "Thank you for the thorough review throughout the sprint! Merging to main now. <3"
+### PR #61: feat: Actions Taken and Ticket Workflow UI
+- **Branch:** `feature/actions-taken-ui` -> `lab4-staging`
+- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/61
+- **Reviewer Comment:** "The Actions Taken table and responsive modal work smoothly across mobile and desktop. Dynamic follow-up validation and permitted status transitions are cleanly enforced with 409 conflict banners. Approved kub!"
+- **My Response:** "Thank you! Proceeding to the Dashboards UI implementation."
 
 ---
 
