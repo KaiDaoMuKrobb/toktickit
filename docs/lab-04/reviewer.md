@@ -28,12 +28,12 @@
 ### PR #59: feat: Ticket status workflow transitions and resolution gate
 - **Branch:** `feature/ticket-workflow` -> `lab4-staging`
 - **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/59
-- **Reviewer Comment:** "The status transition matrix is strictly enforced on the backend, and the optimistic concurrency check via `updatedAt` works reliably. Resolution gate ensures proper IT review. Approved!"
+- **Reviewer Comment:** "Great work! The ticket lifecycle workflow transitions and concurrent update conflict handling are well-enforced, with all tests passing. Approved and ready to merge kubb! <3"
 - **My Response:** "Thank you kub! Now proceeding to the Dashboards implementation."
 
-### PR #51: feat: Requester, IT Staff, and Administrator Dashboards
+### PR #60: feat: Requester, IT Staff, and Administrator Dashboard APIs
 - **Branch:** `feature/dashboards` -> `lab4-staging`
-- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/51
+- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/60
 - **Reviewer Comment:** "Dashboards return authoritative metrics with fast aggregations. The Requester dashboard strictly enforces user boundaries, and the Staff dashboard drill-downs are clean. Approved kubb!"
 - **My Response:** "Thanks! Starting the UI components and Zen Green styling."
 
