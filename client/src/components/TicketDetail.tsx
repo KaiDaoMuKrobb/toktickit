@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { Category } from "../api.js";
 import { AttachmentSection } from "./AttachmentSection.js";
+import { ActionsTakenSection } from "./ActionsTakenSection.js";
 import { useAuth } from "../AuthContext.js";
 
-// Attachment interface moved to AttachmentSection.tsx, but kept here for type definition
 export interface Attachment {
   id: number;
   originalName: string;
@@ -20,6 +19,7 @@ interface TicketDetailData {
   description: string;
   relatedSystem: { id: number; name: string };
   currentStatus: string;
+  status: string;
   updatedAt: string;
   createdAt: string;
   category: { id: number; name: string };
@@ -48,12 +48,24 @@ interface Props {
   onBack: () => void;
 }
 
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  "New": ["Open", "In Progress", "Cancelled"],
+  "Open": ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
+  "In Progress": ["Open", "Waiting for Requester", "Resolved", "Cancelled"],
+  "Waiting for Requester": ["In Progress", "Open", "Resolved", "Cancelled"],
+  "Resolved": ["Closed", "Reopened"],
+  "Closed": ["Reopened"],
+  "Reopened": ["In Progress", "Open", "Resolved", "Cancelled"],
+  "Cancelled": []
+};
+
 export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
   const { user } = useAuth();
   const [ticket, setTicket] = useState<TicketDetailData | null>(null);
   const [communications, setCommunications] = useState<Communication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [conflictError, setConflictError] = useState("");
   
   const [newComment, setNewComment] = useState("");
   const [newNote, setNewNote] = useState("");
@@ -74,7 +86,7 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
       })
       .then(data => {
         setTicket(data);
-        setEditStatus(data.currentStatus);
+        setEditStatus(data.currentStatus || data.status);
         setEditPriority(data.itPriority);
         setLoading(false);
       })
@@ -100,15 +112,29 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId]);
 
-  const handleUpdateTicket = async (updates: Partial<TicketDetailData>) => {
+  const handleUpdateTicket = async (updates: Record<string, any>) => {
     setIsUpdating(true);
+    setConflictError("");
     try {
+      const payload: Record<string, any> = { ...updates };
+      if (updates.status && ticket?.updatedAt && !payload.expectedUpdatedAt) {
+        payload.expectedUpdatedAt = ticket.updatedAt;
+      }
       const res = await fetch(`/api/tickets/${ticketId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(payload)
       });
-      if (!res.ok) throw new Error("Failed to update ticket");
+
+      if (res.status === 409) {
+        setConflictError("Conflict Detected: This ticket was modified by another user. Your changes were not applied to avoid overwriting.");
+        return;
+      }
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to update ticket");
+      }
       fetchTicket();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Error updating ticket");
@@ -124,14 +150,15 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value;
+    if (newStatus === (ticket?.currentStatus || ticket?.status)) return;
     setEditStatus(newStatus);
-    handleUpdateTicket({ status: newStatus } as any);
+    handleUpdateTicket({ status: newStatus });
   };
 
   const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newPriority = e.target.value;
     setEditPriority(newPriority);
-    handleUpdateTicket({ itPriority: newPriority } as any);
+    handleUpdateTicket({ itPriority: newPriority });
   };
 
   const handlePostComment = async (isResolution = false) => {
@@ -170,7 +197,6 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
     }
   };
 
-
   if (loading) {
     return (
       <div className="text-center py-5">
@@ -192,6 +218,9 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
     );
   }
 
+  const currentStatusVal = ticket.currentStatus || ticket.status;
+  const permittedTransitions = ALLOWED_TRANSITIONS[currentStatusVal] || [];
+
   return (
     <div className="card shadow-sm border-0">
       <div className="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -204,37 +233,60 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
         
         <div className="d-flex align-items-center gap-2">
           {ticket.requesterResolved && (
-            <span className="badge bg-warning text-dark me-2">Appears Resolved</span>
+            <span className="badge bg-warning text-dark me-2">
+              <i className="bi bi-check-circle me-1"></i>Appears Resolved
+            </span>
           )}
           
           {isStaff ? (
-            <select 
-              className={`form-select form-select-sm fw-bold ${editStatus === 'New' ? 'text-primary' : 'text-secondary'}`}
-              value={editStatus}
-              onChange={handleStatusChange}
-              disabled={isUpdating}
-              style={{ width: 'auto' }}
-            >
-              <option value="New">New</option>
-              <option value="Open">Open</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Waiting for Requester">Waiting for Requester</option>
-              <option value="Resolved">Resolved</option>
-              <option value="Closed">Closed</option>
-              <option value="Reopened">Reopened</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
+            <div className="d-flex align-items-center gap-2">
+              <label htmlFor="status-select" className="small text-muted mb-0 fw-bold">Status:</label>
+              <select 
+                id="status-select"
+                className={`form-select form-select-sm fw-bold ${currentStatusVal === 'New' ? 'text-primary' : 'text-secondary'}`}
+                value={editStatus}
+                onChange={handleStatusChange}
+                disabled={isUpdating}
+                style={{ width: 'auto' }}
+                aria-label="Ticket Status"
+              >
+                <option value={currentStatusVal}>{currentStatusVal} (Current)</option>
+                {permittedTransitions.map((st) => (
+                  <option key={st} value={st}>{st}</option>
+                ))}
+              </select>
+            </div>
           ) : (
-            <span className={`badge ${ticket.currentStatus === 'New' ? 'bg-primary' : 'bg-secondary'}`}>
-              {ticket.currentStatus}
+            <span className={`badge ${currentStatusVal === 'New' ? 'bg-primary' : currentStatusVal === 'Resolved' ? 'bg-success' : 'bg-secondary'}`}>
+              {currentStatusVal}
             </span>
           )}
         </div>
       </div>
+
+      {conflictError && (
+        <div className="alert alert-warning d-flex justify-content-between align-items-center mx-4 mb-0 mt-3" role="alert">
+          <div>
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            {conflictError}
+          </div>
+          <button className="btn btn-sm btn-outline-dark" onClick={() => { setConflictError(""); fetchTicket(); }}>
+            <i className="bi bi-arrow-clockwise me-1"></i> Refresh Ticket
+          </button>
+        </div>
+      )}
+
+      {isStaff && ticket.requesterResolved && currentStatusVal !== "Resolved" && currentStatusVal !== "Closed" && (
+        <div className="alert alert-warning mx-4 mb-0 mt-3 border-warning" role="alert">
+          <i className="bi bi-lightbulb-fill me-2 text-warning"></i>
+          <strong>Requester Feedback:</strong> The requester indicated that the problem appears resolved. Please review Actions Taken and formally transition the ticket to <strong>Resolved</strong>.
+        </div>
+      )}
       
       <div className="card-body bg-light">
         <div className="row g-4">
           <div className="col-lg-8">
+            {/* Ticket Information */}
             <div className="card shadow-sm border-0 p-4 mb-4">
               <h5 className="border-bottom pb-3 mb-4 d-flex justify-content-between align-items-center">
                 Ticket Information
@@ -274,6 +326,7 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
                       value={editPriority}
                       onChange={handlePriorityChange}
                       disabled={isUpdating}
+                      aria-label="IT Priority"
                     >
                       <option value="Low">Low</option>
                       <option value="Medium">Medium</option>
@@ -286,6 +339,9 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
                 </div>
               </div>
             </div>
+
+            {/* Actions Taken Section */}
+            <ActionsTakenSection ticketId={ticketId} onActionChanged={fetchTicket} />
 
             {/* Communications Section */}
             <div className="card shadow-sm border-0 p-4 mb-4">
