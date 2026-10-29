@@ -23,7 +23,7 @@ describe("ChangePassword Component", () => {
       fetchUser: mockFetchUser,
       logout: vi.fn(),
     });
-    global.fetch = vi.fn();
+    (globalThis as any).fetch = vi.fn();
   });
 
   it("should render the change password form", () => {

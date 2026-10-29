@@ -8,11 +8,11 @@ describe("StaffTicketQueue Component", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn();
+    (globalThis as any).fetch = vi.fn();
   });
 
   it("should render the queue table and display tickets", async () => {
-    vi.mocked(global.fetch).mockImplementation((url) => {
+    vi.mocked((globalThis as any).fetch).mockImplementation((url: any) => {
       if (url.toString().includes("/api/categories")) {
         return Promise.resolve({
           ok: true,
@@ -53,7 +53,7 @@ describe("StaffTicketQueue Component", () => {
   });
 
   it("should show empty state when no tickets are returned", async () => {
-    vi.mocked(global.fetch).mockImplementation((url) => {
+    vi.mocked((globalThis as any).fetch).mockImplementation((url: any) => {
       if (url.toString().includes("/api/categories")) {
         return Promise.resolve({
           ok: true,
