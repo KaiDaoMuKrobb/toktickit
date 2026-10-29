@@ -473,21 +473,54 @@ app.delete("/api/tickets/:ticketId/attachments/:attachmentId", authenticate, req
 });
 
 // ---------------------------------------------------------------------------
-// Lab 3 - IT Staff Ticket Operations (Issue 35)
+// Lab 3 - IT Staff Ticket Operations (Issue 35) & Lab 4 Status Workflow
 // ---------------------------------------------------------------------------
+
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  "New": ["Open", "In Progress", "Cancelled"],
+  "Open": ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
+  "In Progress": ["Open", "Waiting for Requester", "Resolved", "Cancelled"],
+  "Waiting for Requester": ["In Progress", "Open", "Resolved", "Cancelled"],
+  "Resolved": ["Closed", "Reopened"],
+  "Closed": ["Reopened"],
+  "Reopened": ["In Progress", "Open", "Resolved", "Cancelled"],
+  "Cancelled": []
+};
 
 app.patch("/api/tickets/:id", authenticate, requireRole(["IT Staff", "Administrator"]), async (req: Request, res: Response) => {
   try {
     const ticketId = parseInt(req.params.id, 10);
-    const { ownerId, itPriority, status } = req.body;
+    const { ownerId, itPriority, status, expectedUpdatedAt } = req.body;
     const prisma = getPrisma();
 
     const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
     if (!ticket) return res.status(404).json({ error: "Ticket not found" });
 
+    // Optimistic Concurrency Check (AC-07 / BR-08)
+    if (expectedUpdatedAt) {
+      const serverTime = ticket.updatedAt.toISOString();
+      const clientTime = new Date(expectedUpdatedAt).toISOString();
+      if (serverTime !== clientTime) {
+        return res.status(409).json({
+          error: "Conflict: Ticket has been modified by another user",
+          currentTicket: ticket
+        });
+      }
+    }
+
     const validStatuses = ["New", "Open", "In Progress", "Waiting for Requester", "Resolved", "Closed", "Reopened", "Cancelled"];
     if (status && !validStatuses.includes(status)) {
       return res.status(400).json({ error: "Invalid status" });
+    }
+
+    // Status Transition Matrix Enforcement (AC-06 / BR-07)
+    if (status && status !== ticket.status) {
+      const allowed = ALLOWED_TRANSITIONS[ticket.status] || [];
+      if (!allowed.includes(status)) {
+        return res.status(400).json({
+          error: `Invalid status transition from '${ticket.status}' to '${status}'. Allowed transitions: ${allowed.join(", ") || "none"}`
+        });
+      }
     }
 
     if (ownerId !== undefined && ownerId !== null) {
@@ -962,17 +995,6 @@ app.patch("/api/tickets/:id/actions/:actionId", authenticate, requireRole(["IT S
 // ---------------------------------------------------------------------------
 // 4. Ticket Status Workflow & Concurrency: PATCH /api/tickets/:id/status
 // ---------------------------------------------------------------------------
-const ALLOWED_TRANSITIONS: Record<string, string[]> = {
-  "New": ["Open", "In Progress", "Cancelled"],
-  "Open": ["In Progress", "Waiting for Requester", "Resolved", "Cancelled"],
-  "In Progress": ["Open", "Waiting for Requester", "Resolved", "Cancelled"],
-  "Waiting for Requester": ["In Progress", "Open", "Resolved", "Cancelled"],
-  "Resolved": ["Closed", "Reopened"],
-  "Closed": ["Reopened"],
-  "Reopened": ["In Progress", "Open", "Resolved", "Cancelled"],
-  "Cancelled": []
-};
-
 app.patch("/api/tickets/:id/status", authenticate, requireRole(["IT Staff", "Administrator"]), async (req: Request, res: Response) => {
   try {
     const ticketId = parseInt(req.params.id, 10);

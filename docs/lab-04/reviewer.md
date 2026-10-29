@@ -22,12 +22,12 @@
 ### PR #58: feat: Actions Taken REST API and role authorization
 - **Branch:** `feature/actions-taken-api` -> `lab4-staging`
 - **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/58
-- **Reviewer Comment:** "The Actions Taken REST endpoints enforce role authorization cleanly, with automatic actor capture and dynamic follow-up validation. All automated API tests pass. Approved kubb! <3"
+- **Reviewer Comment:** "Everything looks solid! The ActionTaken model, safe migration, and idempotent seed scenarios match the Sprint 4 contract cleanly with zero regressions. Approved and ready to merge kubb! <3"
 - **My Response:** "Thank you! Moving on to ticket workflow transitions and resolution gate."
 
-### PR #50: feat: Ticket status workflow transitions and resolution gate
+### PR #59: feat: Ticket status workflow transitions and resolution gate
 - **Branch:** `feature/ticket-workflow` -> `lab4-staging`
-- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/50
+- **Link:** https://github.com/KaiDaoMuKrobb/toktickit/pull/59
 - **Reviewer Comment:** "The status transition matrix is strictly enforced on the backend, and the optimistic concurrency check via `updatedAt` works reliably. Resolution gate ensures proper IT review. Approved!"
 - **My Response:** "Thank you kub! Now proceeding to the Dashboards implementation."
 
