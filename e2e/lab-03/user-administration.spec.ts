@@ -10,6 +10,7 @@ test.describe('Lab 3: User Administration', () => {
     await page.click('button[type="submit"]');
 
     // 2. View Users
+    await page.click('button[aria-label="Admin Users"]');
     await expect(page.locator('h2:has-text("Administrator User Management")')).toBeVisible();
 
     // 3. Open Create Modal

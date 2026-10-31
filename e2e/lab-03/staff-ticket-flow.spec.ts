@@ -10,6 +10,7 @@ test.describe('Lab 3: Staff Ticket Flow', () => {
     await page.click('button[type="submit"]');
 
     // 2. View Queue
+    await page.click('button[aria-label="Ticket Queue"]');
     await expect(page.locator('h2:has-text("IT Staff Ticket Queue")')).toBeVisible();
 
     // Wait for tickets to load and click the first one

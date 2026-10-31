@@ -34,7 +34,8 @@ test.describe('Lab 3: Authentication and Requester Regression', () => {
     await page.click('.btn-close');
 
     // 3. View Own Tickets
-    await expect(page.locator('text=My Tickets')).toBeVisible();
+    await page.click('button[aria-label="My Tickets"]');
+    await expect(page.locator('h2:has-text("My Tickets")')).toBeVisible();
     await expect(page.locator('text=E2E Test Auth Ticket').first()).toBeVisible();
   });
 });

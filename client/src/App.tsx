@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { checkSystem, Category } from "./api.js";
 import { CreateTicket } from "./components/CreateTicket.js";
 import { MyTickets } from "./components/MyTickets.js";
@@ -19,6 +19,11 @@ function AppContent() {
   const [currentView, setCurrentView] = useState<"dashboard" | "home" | "create" | "detail" | "admin" | "queue">("dashboard");
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [createdTicketNumber, setCreatedTicketNumber] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrentView("dashboard");
+    setSelectedTicketId(null);
+  }, [user?.id]);
 
   const [state, setState] = useState<UiState>("idle");
   const [categories, setCategories] = useState<Category[]>([]);

@@ -4,16 +4,16 @@ test.describe('E2E-01: Actions Taken Logging and Role Boundary Flow', () => {
   test('IT Staff adds Action Taken, Requester views in read-only mode', async ({ page }) => {
     // 1. IT Staff Login
     await page.goto('/');
-    await page.fill('input[type="email"]', 'michael@example.com');
+    await page.fill('input[type="email"]', 'it1@example.com');
     await page.fill('input[type="password"]', 'password123');
     await page.click('button[type="submit"]');
 
     // Wait for Dashboard
-    await expect(page.locator('text=Welcome back, Michael Scott!')).toBeVisible();
+    await expect(page.locator('text=Welcome back, IT Staff One!')).toBeVisible();
 
     // Navigate to Ticket Queue
     await page.click('button:has-text("Ticket Queue")');
-    await expect(page.locator('text=Queue Overview')).toBeVisible();
+    await expect(page.locator('h2:has-text("IT Staff Ticket Queue")')).toBeVisible();
 
     // Click on the first ticket to view detail
     const firstTicketRow = page.locator('table tbody tr').first();
@@ -42,20 +42,21 @@ test.describe('E2E-01: Actions Taken Logging and Role Boundary Flow', () => {
 
     // Verify Action is listed in the table
     await expect(page.locator('text=Replaced thermal paste and dusted internal cooling heatsinks').first()).toBeVisible();
-    await expect(page.locator('text=Michael Scott').first()).toBeVisible();
+    await expect(page.locator('text=IT Staff One').first()).toBeVisible();
 
     // Logout
     await page.click('button:has-text("Logout")');
+    await expect(page.locator('text=TokTickIT Login')).toBeVisible();
 
     // 2. Requester Login
-    await page.fill('input[type="email"]', 'jennifer@example.com');
-    await page.fill('input[type="password"]', 'password123');
+    await page.fill('input#email', 'jennifer@example.com');
+    await page.fill('input#password', 'password123');
     await page.click('button[type="submit"]');
 
     await expect(page.locator('text=Welcome, Jennifer Anderson!')).toBeVisible();
 
     // Open first recent ticket or go to My Tickets
-    await page.click('button:has-text("My Tickets")');
+    await page.click('button[aria-label="My Tickets"]');
     const requesterTicketRow = page.locator('table tbody tr').first();
     if (await requesterTicketRow.isVisible()) {
       await requesterTicketRow.click();
