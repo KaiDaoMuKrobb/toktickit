@@ -191,10 +191,12 @@ toktickit/
 ├── docs/                   # Laboratory documentation and PDF exports
 │   ├── lab-01/             # Lab 1 documents and evidence
 │   ├── lab-02/             # Lab 2 specification, AI use, and peer review logs
-│   └── lab-03/             # Lab 3 specification, tests, and peer review logs
+│   ├── lab-03/             # Lab 3 specification, tests, and peer review logs
+│   └── lab-04/             # Lab 4 specification, tests, and peer review logs
 ├── artifacts/              # Generated artifacts and screenshots
 │   ├── lab-02/             # Screenshots for Lab 2 submission
-│   └── lab-03/             # Screenshots for Lab 3 submission
+│   ├── lab-03/             # Screenshots for Lab 3 submission
+│   └── lab-04/             # Screenshots for Lab 4 submission
 ├── .gitignore              # Ignored files (node_modules, .env, dist, etc.)
 └── README.md               # You are here!
 ```
