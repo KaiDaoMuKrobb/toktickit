@@ -19,9 +19,8 @@ body {
   border-radius: 16px;
   border: 1px solid rgba(0, 0, 0, 0.05) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #ffffff;
+  transition: box-shadow 0.2s ease;
 }
 
 .card:hover {

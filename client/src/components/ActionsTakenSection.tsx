@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "../AuthContext.js";
 
 export interface ActionTaken {
@@ -318,17 +319,17 @@ export function ActionsTakenSection({ ticketId, onActionChanged }: Props) {
       )}
 
       {/* Add / Edit Modal */}
-      {showModal && (
+      {showModal && typeof document !== "undefined" && createPortal(
         <div
           className="modal fade show d-block"
           tabIndex={-1}
           role="dialog"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1055 }}
           aria-modal="true"
         >
           <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div className="modal-content border-0 shadow">
-              <div className="modal-header bg-success text-white py-3">
+            <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+              <div className="modal-header bg-success text-white py-3 px-4">
                 <h5 className="modal-title fw-bold">
                   {editingActionId ? "Edit Action Taken" : "Add Action Taken"}
                 </h5>
@@ -342,7 +343,7 @@ export function ActionsTakenSection({ ticketId, onActionChanged }: Props) {
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div className="modal-body p-4">
+                <div className="modal-body p-4" style={{ maxHeight: "80vh", overflowY: "auto" }}>
                   {formError && (
                     <div className="alert alert-danger py-2 mb-3" role="alert">
                       {formError}
@@ -487,7 +488,8 @@ export function ActionsTakenSection({ ticketId, onActionChanged }: Props) {
               </form>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
