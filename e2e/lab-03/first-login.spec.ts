@@ -1,15 +1,31 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Lab 3: Mandatory Password Change', () => {
-  test('Initial password login and change', async ({ page }) => {
+  test('Initial password login and change', async ({ page, request }) => {
+    // Reset newuser password and mustChangePassword state via Admin API so this test is completely idempotent
+    try {
+      const adminLogin = await request.post('/api/auth/login', {
+        data: { email: 'admin@example.com', password: 'password123' }
+      });
+      if (adminLogin.ok()) {
+        const usersRes = await request.get('/api/users?search=newuser@example.com');
+        if (usersRes.ok()) {
+          const usersData = await usersRes.json();
+          const usersList = Array.isArray(usersData) ? usersData : usersData.data || [];
+          const newuser = usersList.find((u: any) => u.email === 'newuser@example.com');
+          if (newuser) {
+            await request.post(`/api/users/${newuser.id}/reset-password`, {
+              data: { newPassword: 'password123' }
+            });
+          }
+        }
+        await request.post('/api/auth/logout');
+      }
+    } catch {
+      // Fallback if API request setup fails
+    }
+
     // 1. Log in with user that has mustChangePassword = true
-    // Assuming req2@example.com is an inactive or new user, wait, let's use an admin to create a new user,
-    // or just login with the seeded "mustChangePassword" user. The seeded DB typically has one.
-    // If not, we test the rejection logic. Let's just login with a known account that we reset.
-    // Wait, testing password change in E2E without a dedicated test user might fail if it's already changed.
-    // The requirement says "Normal app opens only after valid change". Let's assume reqnew@example.com
-    
-    // Instead of doing a full E2E that breaks after 1 run, we'll verify the login form and error states.
     await page.goto('/');
     
     await page.fill('input[type="email"]', 'newuser@example.com');

@@ -208,19 +208,20 @@ export function ActionsTakenSection({ ticketId, onActionChanged }: Props) {
             <table className="table table-hover align-middle mb-0" style={{ borderCollapse: "separate" }}>
               <thead className="table-light">
                 <tr className="small text-muted text-uppercase">
-                  <th scope="col" style={{ width: "16%" }}>Date / Time</th>
-                  <th scope="col" style={{ width: "28%" }}>Action Description</th>
-                  <th scope="col" style={{ width: "24%" }}>Result</th>
-                  <th scope="col" style={{ width: "16%" }}>Performed By</th>
-                  <th scope="col" style={{ width: "16%" }}>Follow-up</th>
+                  <th scope="col" style={{ width: "15%" }}>Date / Time</th>
+                  <th scope="col" style={{ width: "27%" }}>Action Description</th>
+                  <th scope="col" style={{ width: "23%" }}>Result</th>
+                  <th scope="col" style={{ width: "14%" }}>Performed By</th>
+                  <th scope="col" style={{ width: "13%" }}>Follow-up</th>
                   {isStaff && <th scope="col" className="text-end" style={{ width: "8%" }}>Actions</th>}
                 </tr>
               </thead>
               <tbody>
                 {actions.map((act) => (
                   <tr key={act.id}>
-                    <td className="small text-nowrap fw-medium">
-                      {new Date(act.actionDateTime).toLocaleString()}
+                    <td className="small fw-medium">
+                      <div className="text-nowrap">{new Date(act.actionDateTime).toLocaleDateString()}</div>
+                      <small className="text-muted text-nowrap">{new Date(act.actionDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>
                     </td>
                     <td>
                       <div className="fw-medium text-dark">{act.description}</div>

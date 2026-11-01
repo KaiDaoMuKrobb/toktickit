@@ -285,9 +285,9 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
       
       <div className="card-body bg-light">
         <div className="row g-4">
+          {/* Top Row: Left Column - Ticket Information */}
           <div className="col-lg-8">
-            {/* Ticket Information */}
-            <div className="card shadow-sm border-0 p-4 mb-4">
+            <div className="card shadow-sm border-0 p-4 h-100">
               <h5 className="border-bottom pb-3 mb-4 d-flex justify-content-between align-items-center">
                 Ticket Information
                 {isStaff && (
@@ -303,22 +303,22 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
               </h5>
               <div className="mb-4">
                 <label className="fw-bold text-muted small text-uppercase mb-1">Summary</label>
-                <p className="fs-5 fw-medium text-dark">{ticket.summary}</p>
+                <p className="fs-5 fw-medium text-dark mb-0">{ticket.summary}</p>
               </div>
               <div className="mb-4">
                 <label className="fw-bold text-muted small text-uppercase mb-2">Description</label>
-                <p className="bg-light p-3 rounded-3 text-break" style={{ whiteSpace: "pre-wrap", border: "1px solid #edf2f7" }}>{ticket.description}</p>
+                <p className="bg-light p-3 rounded-3 text-break mb-0" style={{ whiteSpace: "pre-wrap", border: "1px solid #edf2f7" }}>{ticket.description}</p>
               </div>
               <div className="row">
-                <div className="col-sm-4 mb-3">
+                <div className="col-sm-4 mb-3 mb-sm-0">
                   <label className="fw-bold text-muted small text-uppercase mb-1">Category</label>
-                  <p className="fw-medium">{ticket.category?.name}</p>
+                  <p className="fw-medium mb-0">{ticket.category?.name}</p>
                 </div>
-                <div className="col-sm-4 mb-3">
+                <div className="col-sm-4 mb-3 mb-sm-0">
                   <label className="fw-bold text-muted small text-uppercase mb-1">Related System</label>
-                  <p className="fw-medium">{ticket.relatedSystem?.name}</p>
+                  <p className="fw-medium mb-0">{ticket.relatedSystem?.name}</p>
                 </div>
-                <div className="col-sm-4 mb-3">
+                <div className="col-sm-4">
                   <label className="fw-bold text-muted small text-uppercase mb-1">IT Priority</label>
                   {isStaff ? (
                     <select 
@@ -334,17 +334,31 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
                       <option value="Critical">Critical</option>
                     </select>
                   ) : (
-                    <p className="fw-medium">{ticket.itPriority || ticket.requestedPriority || "Medium"}</p>
+                    <p className="fw-medium mb-0">{ticket.itPriority || ticket.requestedPriority || "Medium"}</p>
                   )}
                 </div>
               </div>
             </div>
+          </div>
+          
+          {/* Top Row: Right Column - Attachments */}
+          <div className="col-lg-4">
+            <AttachmentSection 
+              ticketId={ticketId} 
+              requesterId={requesterId} 
+              attachments={ticket.attachments} 
+              onAttachmentChanged={fetchTicket} 
+            />
+          </div>
 
-            {/* Actions Taken Section */}
+          {/* Full-Width Row: Actions Taken */}
+          <div className="col-12">
             <ActionsTakenSection ticketId={ticketId} onActionChanged={fetchTicket} />
+          </div>
 
-            {/* Communications Section */}
-            <div className="card shadow-sm border-0 p-4 mb-4">
+          {/* Full-Width Row: Communications */}
+          <div className="col-12">
+            <div className="card shadow-sm border-0 p-4 mb-0">
               <h5 className="border-bottom pb-3 mb-4">Communications</h5>
               
               <div className="mb-4" style={{ maxHeight: '400px', overflowY: 'auto' }}>
@@ -421,15 +435,6 @@ export function TicketDetail({ ticketId, requesterId, onBack }: Props) {
               </div>
 
             </div>
-          </div>
-          
-          <div className="col-lg-4">
-            <AttachmentSection 
-              ticketId={ticketId} 
-              requesterId={requesterId} 
-              attachments={ticket.attachments} 
-              onAttachmentChanged={fetchTicket} 
-            />
           </div>
         </div>
       </div>

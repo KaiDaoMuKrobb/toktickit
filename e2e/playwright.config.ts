@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+declare const process: any;
+
 export default defineConfig({
   testDir: './',
   fullyParallel: false,

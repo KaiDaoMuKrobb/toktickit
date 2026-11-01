@@ -69,7 +69,7 @@ function AppContent() {
   const isAdmin = user.role === "Administrator";
 
   return (
-    <div className="container py-5" style={{ maxWidth: 1050 }}>
+    <div className="container py-5" style={{ maxWidth: 1200 }}>
       {/* Navigation Header */}
       <div className="app-header d-flex justify-content-between align-items-center mb-4 pb-3 rounded-bottom-4 px-3 shadow-sm" style={{ margin: "-3rem -1rem 2rem -1rem" }}>
         <h1 className="h3 mb-0 fw-bold" style={{ cursor: 'pointer', letterSpacing: '-0.5px' }} onClick={() => setCurrentView("dashboard")}>
